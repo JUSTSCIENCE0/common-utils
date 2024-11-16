@@ -15,7 +15,6 @@ endif()
 
 option(BUILD_CU_APPS        "Build example applications" ON)
 option(BUILD_CU_TEST        "Build tests" ON)
-option(CU_ENABLE_CPU_UTILS  "Enable CPU Utils" ON)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options(
@@ -42,15 +41,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_library(common-utils STATIC)
+target_sources(common-utils
+    PUBLIC
+        include/cpu-utils.h
+    PRIVATE
+        src/cpu-utils.cpp
+)
+target_include_directories(common-utils
+    PUBLIC
+        include/)
 
-if (CU_ENABLE_CPU_UTILS)
-    target_sources(common-utils
-        PUBLIC
-            include/cpu-utils.h
-        PRIVATE
-            src/cpu-utils.cpp
-    )
-endif(CU_ENABLE_CPU_UTILS)
+# CPU identifiers
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
+    message(STATUS "CPU Architecture  ${CMAKE_SYSTEM_PROCESSOR}")
+    add_compile_definitions(CU_ARCH_X86_64)
+#elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")  TODO
+#elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")      TODO
+else()
+    message(FATAL_ERROR "Unsupported CPU Architecture - ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
 
 if (BUILD_CU_APPS)
     add_subdirectory(apps)
