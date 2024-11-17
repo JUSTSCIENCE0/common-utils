@@ -5,6 +5,4 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-if (CU_ENABLE_CPU_UTILS)
-    add_subdirectory(cpu-descriptor)
-endif(CU_ENABLE_CPU_UTILS)
+add_subdirectory(cpu-descriptor)

@@ -10,4 +10,8 @@ project(cpu-descriptor)
 add_executable(cpu-descriptor
     main.cpp)
 
+target_link_libraries(cpu-descriptor
+    PRIVATE
+        common-utils)
+
 set_property(TARGET cpu-descriptor PROPERTY FOLDER "apps")
