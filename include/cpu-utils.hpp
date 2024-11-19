@@ -57,10 +57,11 @@ namespace CU {
 #include "code-generators/instructions-sets.h"
 
 // for INSTRUCTIONS_SETS the following objects are generated:
-//  - enum E_INSTRUCTIONS_FAMILY - list of all instructions families
-//  - enum E_INSTRUCTIONS_FAMILY_SUPPORT_FLAG - one-hot encoded list of all instructions families
-//  - static const char* STR_INSTRUCTIONS_FAMILY[] - array of instructions family names
-//  - enum E_INSTRUCTIONS_SET_<INSTRUCTIONS_FAMILY_NAME> - list of instructions sets included in the family
-//  - static const char* STR_INSTRUCTIONS_SETS[][] - array of instructions set names
+//  - single enum E_INSTRUCTIONS_FAMILY - list of all instructions families
+//  - single enum E_INSTRUCTIONS_FAMILY_SUPPORT_FLAG - one-hot encoded list of all instructions families
+//  - single static const char* STR_INSTRUCTIONS_FAMILY[] - array of instructions family names
+//  - set of enum E_INSTRUCTIONS_SET_<INSTRUCTIONS_FAMILY_NAME> - list of instructions sets included in the family
+//  - set of enum E_INSTRUCTIONS_SET_<INSTRUCTIONS_FAMILY_NAME>_SUPPORT_FLAG - one-hot encoded list of instructions sets included in the family
+//  - single static const char* STR_INSTRUCTIONS_SETS[][] - array of instructions set names
 
 }
