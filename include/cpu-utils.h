@@ -10,7 +10,8 @@ namespace CU {
     // instructions family
     // instructions sets
 
-#ifdef CU_ARCH_X86_64
+#ifndef INSTRUCTIONS_SETS
+#ifdef  CU_ARCH_X86_64
 // see https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
 
 #define INSTRUCTIONS_SETS                               \
@@ -49,7 +50,8 @@ namespace CU {
         END_INSTRUCTIONS_FAMILY(AVX_512)  \
     END_INSTRUCTIONS_FAMILIES_LIST
 
-#endif // CU_ARCH_X86_64
+#endif //  CU_ARCH_X86_64
+#endif // !INSTRUCTIONS_SETS
 
 #ifndef INSTRUCTIONS_SETS
 #error "Instruction sets are not defined for this platform"
