@@ -2,7 +2,7 @@
 // Email: yakovmen62@gmail.com
 //
 // License: MIT
-#include <cpu-utils.h>
+#include <cpu-utils.hpp>
 
 #include <iostream>
 #include <bitset>

@@ -43,8 +43,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_library(common-utils STATIC)
 target_sources(common-utils
     PUBLIC
-        include/cpu-utils.h
+        include/cpu-utils.hpp
     PRIVATE
+        include/code-generators/instructions-sets.h
         src/cpu-utils.cpp
 )
 target_include_directories(common-utils
