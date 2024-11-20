@@ -49,7 +49,7 @@ INSTRUCTIONS_SETS
 
 // generate instructions family string names
 #define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
-    static const char* STR_INSTRUCTIONS_FAMILY[E_INFAM_COUNT] = {
+    static constexpr const char* STR_INSTRUCTIONS_FAMILY[E_INFAM_COUNT] = {
 #define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
             #FAM_NAME,
 #define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
@@ -105,7 +105,7 @@ INSTRUCTIONS_SETS
 
 // generate instructions sets string names
 #define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
-    static const char* STR_INSTRUCTIONS_SETS[][sizeof(int) * 8 - 1] = {
+    static constexpr const char* STR_INSTRUCTIONS_SETS[][sizeof(int) * 8 - 1] = {
 #define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
         {
 #define         ADD_INSTRACTIONS_SET(SET_NAME, ...) \
@@ -114,6 +114,65 @@ INSTRUCTIONS_SETS
         },
 #define END_INSTRUCTIONS_FAMILIES_LIST \
     };
+INSTRUCTIONS_SETS
+
+#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
+#undef   BEGIN_INSTRUCTIONS_FAMILY
+#undef     ADD_INSTRACTIONS_SET
+#undef   END_INSTRUCTIONS_FAMILY
+#undef END_INSTRUCTIONS_FAMILIES_LIST
+
+// generate current configuration description
+#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
+    static constexpr size_t get_max_instructions_family_name_length(); \
+    static constexpr size_t get_max_instructions_set_name_length(); \
+    static constexpr std::string get_current_configuration_description() {
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME)
+#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
+// TODO
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
+#define END_INSTRUCTIONS_FAMILIES_LIST \
+    }
+
+#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
+#undef   BEGIN_INSTRUCTIONS_FAMILY
+#undef     ADD_INSTRACTIONS_SET
+#undef   END_INSTRUCTIONS_FAMILY
+#undef END_INSTRUCTIONS_FAMILIES_LIST
+
+// ---------------------------------------------------------------------------
+// auxiliary functions
+
+// get_max_instructions_family_name_length
+#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
+    static constexpr size_t get_max_instructions_family_name_length() { \
+        size_t result = 0;
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
+        if (result < std::char_traits<char>::length(#FAM_NAME)) result = std::char_traits<char>::length(#FAM_NAME);
+#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
+#define END_INSTRUCTIONS_FAMILIES_LIST \
+        return result; \
+    }
+INSTRUCTIONS_SETS
+
+#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
+#undef   BEGIN_INSTRUCTIONS_FAMILY
+#undef     ADD_INSTRACTIONS_SET
+#undef   END_INSTRUCTIONS_FAMILY
+#undef END_INSTRUCTIONS_FAMILIES_LIST
+
+// get_max_instructions_set_name_length
+#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
+    static constexpr size_t get_max_instructions_set_name_length() { \
+        size_t result = 0;
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME)
+#define         ADD_INSTRACTIONS_SET(SET_NAME, ...) \
+        if (result < std::char_traits<char>::length(#SET_NAME)) result = std::char_traits<char>::length(#SET_NAME);
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
+#define END_INSTRUCTIONS_FAMILIES_LIST \
+        return result; \
+    }
 INSTRUCTIONS_SETS
 
 #undef BEGIN_INSTRUCTIONS_FAMILIES_LIST

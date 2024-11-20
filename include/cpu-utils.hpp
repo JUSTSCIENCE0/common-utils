@@ -5,6 +5,10 @@
 
 #pragma once
 #include <assert.h>
+#include <stdlib.h>
+
+#include <vector>
+#include <string>
 
 namespace CU {
 // The supported instruction sets are defined using the INSTRUCTIONS_SETS macro.
@@ -28,6 +32,9 @@ namespace CU {
 //          ADD_INSTRACTIONS_SET(SET_N_C, PLATFORM_SPECIFIC_HANDLERS)
 //      END_INSTRUCTIONS_FAMILY(FAMILY_1)
 //  END_INSTRUCTIONS_FAMILIES_LIST
+// 
+// TODO: PLATFORM_SPECIFIC_HANDLERS
+//
 
 #ifndef INSTRUCTIONS_SETS
 #ifdef  CU_ARCH_X86_64
