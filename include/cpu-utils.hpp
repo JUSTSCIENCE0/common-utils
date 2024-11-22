@@ -7,11 +7,17 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <vector>
+#include <array>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <bitset>
+
+#ifdef CU_ARCH_X86_64
+#ifdef  _MSC_VER
+#include <intrin.h>
+#endif // _MSC_VER
+#endif // CU_ARCH_X86_64
 
 namespace CU {
 // The supported instruction sets are defined using the INSTRUCTIONS_SETS macro.
@@ -82,6 +88,27 @@ namespace CU {
 #endif //  CU_ARCH_X86_64
 #endif // !INSTRUCTIONS_SETS
 
+#ifndef USE_CUSTOM_CPU_CONF_READER
+
+#ifdef  CU_ARCH_X86_64
+#ifdef   _MSC_VER
+    std::string get_cpu_vendor() {
+        std::array<int, 4> cpu_descr;
+        __cpuid(cpu_descr.data(), 0);
+
+        char vendor[13] = "";
+        *reinterpret_cast<int*>(vendor)     = cpu_descr[1];
+        *reinterpret_cast<int*>(vendor + 4) = cpu_descr[3];
+        *reinterpret_cast<int*>(vendor + 8) = cpu_descr[2];
+
+        return vendor;
+    }
+
+#endif // _MSC_VER
+#endif // CU_ARCH_X86_64
+
+#endif // !USE_CUSTOM_CPU_CONF_READER
+
 // preprocessor magic works here
 #include "code-generators/instructions-sets.h"
 
@@ -143,5 +170,6 @@ namespace CU {
 //  7) static std::string get_current_configuration_description()
 //     Description: Function that returns a string description of 
 //     the current configuration generated according to INSTRUCTIONS_SETS
-//
+// 
+
 }

@@ -20,6 +20,7 @@ void print_about(const char* prog_name) {
 
 int main(/*int argc, char* argv[]*/) {
     print_about("cpu_descriptor");
-    cout << CU::get_current_configuration_description();
+    cout << CU::get_cpu_vendor() << endl;
+    cout << CU::get_current_configuration_description() << endl;
     return 0;
 }
