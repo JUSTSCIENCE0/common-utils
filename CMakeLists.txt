@@ -18,7 +18,9 @@ option(BUILD_CU_TEST        "Build tests" ON)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options(
-        /W4 /WX               # warnings options
+        # warnings options
+        /W4 /WX
+        /wd4505
         /DUNICODE /D_UNICODE  # use unicode
         /MP                   # multiple processes build
     )
