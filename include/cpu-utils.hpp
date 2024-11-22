@@ -9,6 +9,9 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
+#include <iomanip>
+#include <bitset>
 
 namespace CU {
 // The supported instruction sets are defined using the INSTRUCTIONS_SETS macro.
@@ -136,5 +139,9 @@ namespace CU {
 //     };
 //     Description: Array of instructions set names.
 //                  A similar object is generated for each instructions family.
-
+// 
+//  7) static std::string get_current_configuration_description()
+//     Description: Function that returns a string description of 
+//     the current configuration generated according to INSTRUCTIONS_SETS
+//
 }

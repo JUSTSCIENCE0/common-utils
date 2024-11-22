@@ -5,9 +5,57 @@
 
 #pragma once
 
+// do not use separately from cpu-utils.hpp
+
 #ifndef INSTRUCTIONS_SETS
 #error "Instruction sets are not defined for this platform"
 #endif // !INSTRUCTIONS_SETS
+
+static constexpr size_t MAX_ELEMENTS_COUNT = 31;
+
+// ---------------------------------------------------------------------------
+// begin of auxiliary functions
+
+// get_max_instructions_family_name_length
+#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
+    static constexpr size_t get_max_instructions_family_name_length() { \
+        size_t result = 0;
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
+        if (result < std::char_traits<char>::length(#FAM_NAME)) result = std::char_traits<char>::length(#FAM_NAME);
+#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
+#define END_INSTRUCTIONS_FAMILIES_LIST \
+        return result; \
+    }
+INSTRUCTIONS_SETS
+
+#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
+#undef   BEGIN_INSTRUCTIONS_FAMILY
+#undef     ADD_INSTRACTIONS_SET
+#undef   END_INSTRUCTIONS_FAMILY
+#undef END_INSTRUCTIONS_FAMILIES_LIST
+
+// get_max_instructions_set_name_length
+#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
+    static constexpr size_t get_max_instructions_set_name_length() { \
+        size_t result = 0;
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME)
+#define         ADD_INSTRACTIONS_SET(SET_NAME, ...) \
+        if (result < std::char_traits<char>::length(#SET_NAME)) result = std::char_traits<char>::length(#SET_NAME);
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
+#define END_INSTRUCTIONS_FAMILIES_LIST \
+        return result; \
+    }
+    INSTRUCTIONS_SETS
+
+#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
+#undef   BEGIN_INSTRUCTIONS_FAMILY
+#undef     ADD_INSTRACTIONS_SET
+#undef   END_INSTRUCTIONS_FAMILY
+#undef END_INSTRUCTIONS_FAMILIES_LIST
+
+// end of auxiliary functions
+// ---------------------------------------------------------------------------
 
 // generate instructions family enum
 #define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
@@ -22,7 +70,7 @@
         E_INFAM_BEGIN = 0 \
     };
 INSTRUCTIONS_SETS
-static_assert(E_INFAM_COUNT < sizeof(int) * 8, "Too many instructions families defined");
+static_assert(E_INFAM_COUNT <= MAX_ELEMENTS_COUNT, "Too many instructions families defined");
 
 #undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
 #undef   BEGIN_INSTRUCTIONS_FAMILY
@@ -76,7 +124,7 @@ INSTRUCTIONS_SETS
         E_INSET_ ##FAM_NAME ##_BEGIN = E_INSET_ ##FAM_NAME ##_PREFIX + 1, \
         E_INSET_ ##FAM_NAME ##_COUNT = E_INSET_ ##FAM_NAME ##_END - E_INSET_ ##FAM_NAME ##_BEGIN \
     }; \
-    static_assert(E_INSET_ ##FAM_NAME ##_COUNT < sizeof(int) * 8, "Too many instructions sets defined for family " #FAM_NAME);
+    static_assert(E_INSET_ ##FAM_NAME ##_COUNT <= MAX_ELEMENTS_COUNT, "Too many instructions sets defined for family " #FAM_NAME);
 #define END_INSTRUCTIONS_FAMILIES_LIST
 INSTRUCTIONS_SETS
 
@@ -105,7 +153,7 @@ INSTRUCTIONS_SETS
 
 // generate instructions sets string names
 #define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
-    static constexpr const char* STR_INSTRUCTIONS_SETS[][sizeof(int) * 8 - 1] = {
+    static constexpr const char* STR_INSTRUCTIONS_SETS[][MAX_ELEMENTS_COUNT] = {
 #define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
         {
 #define         ADD_INSTRACTIONS_SET(SET_NAME, ...) \
@@ -124,54 +172,29 @@ INSTRUCTIONS_SETS
 
 // generate current configuration description
 #define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
-    static constexpr size_t get_max_instructions_family_name_length(); \
-    static constexpr size_t get_max_instructions_set_name_length(); \
-    static constexpr std::string get_current_configuration_description() {
-#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME)
-#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
-// TODO
-#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
-#define END_INSTRUCTIONS_FAMILIES_LIST \
-    }
-
-#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
-#undef   BEGIN_INSTRUCTIONS_FAMILY
-#undef     ADD_INSTRACTIONS_SET
-#undef   END_INSTRUCTIONS_FAMILY
-#undef END_INSTRUCTIONS_FAMILIES_LIST
-
-// ---------------------------------------------------------------------------
-// auxiliary functions
-
-// get_max_instructions_family_name_length
-#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
-    static constexpr size_t get_max_instructions_family_name_length() { \
-        size_t result = 0;
+    static std::string get_current_configuration_description() { \
+        std::stringstream res; \
+        constexpr size_t fam_width = get_max_instructions_family_name_length(); \
+        constexpr size_t set_width = get_max_instructions_set_name_length(); \
+        constexpr size_t width = std::max(fam_width, set_width); \
+        E_INSTRUCTIONS_FAMILY current_family; \
+        res << std::hex; \
+        res << std::setfill('-') << std::setw(width + MAX_ELEMENTS_COUNT + 60) << "" << std::setfill(' ') << "\n";
 #define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
-        if (result < std::char_traits<char>::length(#FAM_NAME)) result = std::char_traits<char>::length(#FAM_NAME);
-#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
-#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
-#define END_INSTRUCTIONS_FAMILIES_LIST \
-        return result; \
-    }
-INSTRUCTIONS_SETS
-
-#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
-#undef   BEGIN_INSTRUCTIONS_FAMILY
-#undef     ADD_INSTRACTIONS_SET
-#undef   END_INSTRUCTIONS_FAMILY
-#undef END_INSTRUCTIONS_FAMILIES_LIST
-
-// get_max_instructions_set_name_length
-#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
-    static constexpr size_t get_max_instructions_set_name_length() { \
-        size_t result = 0;
-#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME)
+        current_family = E_INFAM_ ##FAM_NAME; \
+        res << "Instructions family ID: 0x" << \
+            std::right << std::setfill('0') << std::setw(8) << current_family << std::setfill(' ') << \
+            " NAME: " << std::left << std::setw(width + 1) << STR_INSTRUCTIONS_FAMILY[current_family] << \
+            " SUPPORT_FLAG: " << std::bitset<MAX_ELEMENTS_COUNT>(E_INFAM_SUPPORT_FLAG_ ##FAM_NAME) << "\n";
 #define         ADD_INSTRACTIONS_SET(SET_NAME, ...) \
-        if (result < std::char_traits<char>::length(#SET_NAME)) result = std::char_traits<char>::length(#SET_NAME);
-#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
+        res << "Instructions set    ID: 0x" << \
+            std::right << std::setfill('0') << std::setw(8) << E_INSET_ ##SET_NAME << std::setfill(' ') << \
+            " NAME: " << std::left << std::setw(width + 1) << STR_INSTRUCTIONS_SETS[current_family][E_INSET_ ##SET_NAME & 0xFFFF] << \
+            " SUPPORT_FLAG: " << std::bitset<MAX_ELEMENTS_COUNT>(E_INSET_SUPPORT_FLAG_ ##SET_NAME) << "\n";
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) \
+        res << std::setfill('-') << std::setw(width + MAX_ELEMENTS_COUNT + 60) << "" << std::setfill(' ') << "\n";
 #define END_INSTRUCTIONS_FAMILIES_LIST \
-        return result; \
+        return res.str(); \
     }
 INSTRUCTIONS_SETS
 
