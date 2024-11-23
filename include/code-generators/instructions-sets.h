@@ -203,3 +203,60 @@ INSTRUCTIONS_SETS
 #undef     ADD_INSTRACTIONS_SET
 #undef   END_INSTRUCTIONS_FAMILY
 #undef END_INSTRUCTIONS_FAMILIES_LIST
+
+struct CPUConfiguration {
+    std::string m_vendor = "";
+    std::string m_model  = "";
+
+    SupportInsFams m_supported_families = 0;
+    SupportInsSets m_supported_sets[E_INFAM_COUNT] = {};
+};
+
+#ifndef CUSTOM_CPU_CONFIGURATION_READER
+
+#ifdef  CU_ARCH_X86_64
+
+namespace X86_64_IMPL {
+    static std::bitset<32> ECX1 = 0;
+    static std::bitset<32> EDX1 = 0;
+    static std::bitset<32> EBX7 = 0;
+    static std::bitset<32> ECX7 = 0;
+    static std::bitset<32> ECX81 = 0;
+    static std::bitset<32> EDX81 = 0;
+}
+
+#ifdef   _MSC_VER
+// see https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex
+
+#define READ_REGISTERS \
+    std::array<int, 4> cpu_descr;  \
+    __cpuid(cpu_descr.data(), 0);  \
+    int fID_number = cpu_descr[0]; \
+    
+#endif // _MSC_VER
+#endif // CU_ARCH_X86_64
+
+#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
+    static CPUConfiguration read_cpu_configuration() { \
+        CPUConfiguration result = { \
+            .m_vendor = get_cpu_vendor(),\
+            .m_model = get_cpu_model() \
+        };
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME)
+#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME)
+#define END_INSTRUCTIONS_FAMILIES_LIST \
+        return result; \
+    }
+INSTRUCTIONS_SETS
+
+#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
+#undef   BEGIN_INSTRUCTIONS_FAMILY
+#undef     ADD_INSTRACTIONS_SET
+#undef   END_INSTRUCTIONS_FAMILY
+#undef END_INSTRUCTIONS_FAMILIES_LIST
+
+#else
+CUSTOM_CPU_CONFIGURATION_READER
+#endif // !CUSTOM_CPU_CONFIGURATION_READER
+

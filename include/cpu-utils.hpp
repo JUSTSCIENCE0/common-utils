@@ -20,6 +20,11 @@
 #endif // CU_ARCH_X86_64
 
 namespace CU {
+    typedef int InstructionsFamily;
+    typedef int InstructionsSet;
+    typedef int SupportInsFams;
+    typedef int SupportInsSets;
+
 // The supported instruction sets are defined using the INSTRUCTIONS_SETS macro.
 // Custom INSTRUCTIONS_SETS can be used. Due to the limited number of bits in one-hot encoding,
 // the supported instruction sets are divided into families. It is necessary to specify a 
@@ -49,65 +54,87 @@ namespace CU {
 #ifdef  CU_ARCH_X86_64
 // see https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
 
-#define INSTRUCTIONS_SETS                               \
-    BEGIN_INSTRUCTIONS_FAMILIES_LIST                    \
-        BEGIN_INSTRUCTIONS_FAMILY(MMX)                  \
-            ADD_INSTRACTIONS_SET(MMX)                   \
-        END_INSTRUCTIONS_FAMILY(MMX)                    \
-        BEGIN_INSTRUCTIONS_FAMILY(SSE)                  \
-            ADD_INSTRACTIONS_SET(SSE)                   \
-            ADD_INSTRACTIONS_SET(SSE2)                  \
-            ADD_INSTRACTIONS_SET(SSE3)                  \
-            ADD_INSTRACTIONS_SET(SSSE3)                 \
-            ADD_INSTRACTIONS_SET(SSE4_1)                \
-            ADD_INSTRACTIONS_SET(SSE4_2)                \
-        END_INSTRUCTIONS_FAMILY(SSE)                    \
-        BEGIN_INSTRUCTIONS_FAMILY(AVX)                  \
-            ADD_INSTRACTIONS_SET(AVX)                   \
-            ADD_INSTRACTIONS_SET(AVX2)                  \
-        END_INSTRUCTIONS_FAMILY(AVX)                    \
-        BEGIN_INSTRUCTIONS_FAMILY(AVX_512)              \
-            ADD_INSTRACTIONS_SET(AVX_512F)              \
-            ADD_INSTRACTIONS_SET(AVX_512PF)             \
-            ADD_INSTRACTIONS_SET(AVX_512ER)             \
-            ADD_INSTRACTIONS_SET(AVX_512CD)             \
-            ADD_INSTRACTIONS_SET(AVX_512BW)             \
-            ADD_INSTRACTIONS_SET(AVX_512DQ)             \
-            ADD_INSTRACTIONS_SET(AVX_512VL)             \
-            ADD_INSTRACTIONS_SET(AVX_512IFMA)           \
-            ADD_INSTRACTIONS_SET(AVX_512VBMI)           \
-            ADD_INSTRACTIONS_SET(AVX_512VBMI2)          \
-            ADD_INSTRACTIONS_SET(AVX_512VNNI)           \
-            ADD_INSTRACTIONS_SET(AVX_512BITALG)         \
-            ADD_INSTRACTIONS_SET(AVX_512BF16)           \
-            ADD_INSTRACTIONS_SET(AVX_512VPOPCNTDQ)      \
-            ADD_INSTRACTIONS_SET(AVX_512VP2INTERSECT)   \
-        END_INSTRUCTIONS_FAMILY(AVX_512)  \
+#define INSTRUCTIONS_SETS                                  \
+    BEGIN_INSTRUCTIONS_FAMILIES_LIST                       \
+        BEGIN_INSTRUCTIONS_FAMILY(MMX)                     \
+            ADD_INSTRACTIONS_SET(MMX, 0)                   \
+        END_INSTRUCTIONS_FAMILY(MMX)                       \
+        BEGIN_INSTRUCTIONS_FAMILY(SSE)                     \
+            ADD_INSTRACTIONS_SET(SSE, 0)                   \
+            ADD_INSTRACTIONS_SET(SSE2, 0)                  \
+            ADD_INSTRACTIONS_SET(SSE3, 0)                  \
+            ADD_INSTRACTIONS_SET(SSSE3, 0)                 \
+            ADD_INSTRACTIONS_SET(SSE4_1, 0)                \
+            ADD_INSTRACTIONS_SET(SSE4_2, 0)                \
+        END_INSTRUCTIONS_FAMILY(SSE)                       \
+        BEGIN_INSTRUCTIONS_FAMILY(AVX)                     \
+            ADD_INSTRACTIONS_SET(AVX, 0)                   \
+            ADD_INSTRACTIONS_SET(AVX2, 0)                  \
+        END_INSTRUCTIONS_FAMILY(AVX)                       \
+        BEGIN_INSTRUCTIONS_FAMILY(AVX_512)                 \
+            ADD_INSTRACTIONS_SET(AVX_512F, 0)              \
+            ADD_INSTRACTIONS_SET(AVX_512PF, 0)             \
+            ADD_INSTRACTIONS_SET(AVX_512ER, 0)             \
+            ADD_INSTRACTIONS_SET(AVX_512CD, 0)             \
+            ADD_INSTRACTIONS_SET(AVX_512BW, 0)             \
+            ADD_INSTRACTIONS_SET(AVX_512DQ, 0)             \
+            ADD_INSTRACTIONS_SET(AVX_512VL, 0)             \
+            ADD_INSTRACTIONS_SET(AVX_512IFMA, 0)           \
+            ADD_INSTRACTIONS_SET(AVX_512VBMI, 0)           \
+            ADD_INSTRACTIONS_SET(AVX_512VBMI2, 0)          \
+            ADD_INSTRACTIONS_SET(AVX_512VNNI, 0)           \
+            ADD_INSTRACTIONS_SET(AVX_512BITALG, 0)         \
+            ADD_INSTRACTIONS_SET(AVX_512BF16, 0)           \
+            ADD_INSTRACTIONS_SET(AVX_512VPOPCNTDQ, 0)      \
+            ADD_INSTRACTIONS_SET(AVX_512VP2INTERSECT, 0)   \
+        END_INSTRUCTIONS_FAMILY(AVX_512)                   \
     END_INSTRUCTIONS_FAMILIES_LIST
 
 #endif //  CU_ARCH_X86_64
 #endif // !INSTRUCTIONS_SETS
 
-#ifndef USE_CUSTOM_CPU_CONF_READER
+#ifndef CUSTOM_CPU_CONFIGURATION_READER
 
 #ifdef  CU_ARCH_X86_64
 #ifdef   _MSC_VER
-    std::string get_cpu_vendor() {
+// see https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex
+
+    static inline std::string get_cpu_vendor() {
         std::array<int, 4> cpu_descr;
         __cpuid(cpu_descr.data(), 0);
 
         char vendor[13] = "";
-        *reinterpret_cast<int*>(vendor)     = cpu_descr[1];
-        *reinterpret_cast<int*>(vendor + 4) = cpu_descr[3];
-        *reinterpret_cast<int*>(vendor + 8) = cpu_descr[2];
+
+        std::memcpy(vendor,                   &cpu_descr[1], sizeof(int));
+        std::memcpy(vendor + sizeof(int),     &cpu_descr[3], sizeof(int));
+        std::memcpy(vendor + 2 * sizeof(int), &cpu_descr[2], sizeof(int));
+
+        // short name of popular brands
+        if (!strcmp(vendor, "GenuineIntel"))
+            return "Intel";
+        if (!strcmp(vendor, "AuthenticAMD"))
+            return "AMD";
 
         return vendor;
     }
 
+    static inline std::string get_cpu_model() {
+        std::array<int, 4> cpu_descr;
+        __cpuid(cpu_descr.data(), 0x80000000);
+        if (cpu_descr[0] < 0x80000004)
+            return "Not defined";
+
+        char brand[49] = "";
+        __cpuidex(reinterpret_cast<int*>(brand),                   0x80000002, 0);
+        __cpuidex(reinterpret_cast<int*>(brand + sizeof(int) * 4), 0x80000003, 0);
+        __cpuidex(reinterpret_cast<int*>(brand + sizeof(int) * 8), 0x80000004, 0);
+
+        return brand;
+    }
 #endif // _MSC_VER
 #endif // CU_ARCH_X86_64
 
-#endif // !USE_CUSTOM_CPU_CONF_READER
+#endif // !CUSTOM_CPU_CONFIGURATION_READER
 
 // preprocessor magic works here
 #include "code-generators/instructions-sets.h"
@@ -171,5 +198,20 @@ namespace CU {
 //     Description: Function that returns a string description of 
 //     the current configuration generated according to INSTRUCTIONS_SETS
 // 
+//  8) struct CPUConfiguration {
+//          std::string m_vendor = "";
+//          std::string m_model = "";
+//          SupportInsFams m_supported_families = 0;
+//          SupportInsSets m_supported_sets[E_INFAM_COUNT] = {};
+//     };
+//     Description: TODO
+// 
 
+
+std::ostream& operator<<(std::ostream& os, const CPUConfiguration& cpu_conf) {
+    return os << "CPU Vendor: " << cpu_conf.m_vendor << std::endl << \
+        "CPU Model: " << cpu_conf.m_model << std::endl;
+
+    // TODO: supported features
+}
 }
