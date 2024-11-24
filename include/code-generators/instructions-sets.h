@@ -216,15 +216,6 @@ struct CPUConfiguration {
 
 #ifdef  CU_ARCH_X86_64
 
-namespace X86_64_IMPL {
-    static std::bitset<32> ECX1 = 0;
-    static std::bitset<32> EDX1 = 0;
-    static std::bitset<32> EBX7 = 0;
-    static std::bitset<32> ECX7 = 0;
-    static std::bitset<32> ECX81 = 0;
-    static std::bitset<32> EDX81 = 0;
-}
-
 #ifdef   _MSC_VER
 // see https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex
 
@@ -232,18 +223,48 @@ namespace X86_64_IMPL {
     std::array<int, 4> cpu_descr;  \
     __cpuid(cpu_descr.data(), 0);  \
     int fID_number = cpu_descr[0]; \
-    
+    std::unordered_map<std::string, std::array<int, 4>> registers_values; \
+    if (fID_number >= 1) { \
+        __cpuidex(cpu_descr.data(), 1, 0); \
+        registers_values["REG_1_0"] = cpu_descr; \
+    } \
+    if (fID_number >= 7) { \
+        __cpuidex(cpu_descr.data(), 7, 0); \
+        registers_values["REG_7_0"] = cpu_descr; \
+        __cpuidex(cpu_descr.data(), 7, 1); \
+        registers_values["REG_7_1"] = cpu_descr; \
+    } \
+    __cpuid(cpu_descr.data(), 0x80000000);\
+    int fID_ext_number = cpu_descr[0]; \
+    if (fID_ext_number >= 0x80000001) {\
+        __cpuidex(cpu_descr.data(), 0x80000001, 0); \
+        registers_values["EXT_1_0"] = cpu_descr; \
+    }
 #endif // _MSC_VER
 #endif // CU_ARCH_X86_64
+
+#define EAX 0
+#define EBX 1
+#define ECX 2
+#define EDX 3
 
 #define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
     static CPUConfiguration read_cpu_configuration() { \
         CPUConfiguration result = { \
             .m_vendor = get_cpu_vendor(),\
             .m_model = get_cpu_model() \
-        };
-#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME)
-#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
+        }; \
+        int current_family = -1; \
+        int current_family_sf = 0; \
+        READ_REGISTERS
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
+        current_family = E_INFAM_ ##FAM_NAME; \
+        current_family_sf = E_INFAM_SUPPORT_FLAG_ ##FAM_NAME;
+#define         ADD_INSTRACTIONS_SET(SET_NAME, REG_SET, REG, BIT) \
+        if (registers_values[#REG_SET][REG] & (1 << BIT)) { \
+            result.m_supported_families |= current_family_sf; \
+            result.m_supported_sets[current_family] |= E_INSET_SUPPORT_FLAG_ ##SET_NAME; \
+        }
 #define     END_INSTRUCTIONS_FAMILY(FAM_NAME)
 #define END_INSTRUCTIONS_FAMILIES_LIST \
         return result; \
