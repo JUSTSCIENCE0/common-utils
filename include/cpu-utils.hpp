@@ -23,8 +23,8 @@
 namespace CU {
     typedef int InstructionsFamily;
     typedef int InstructionsSet;
-    typedef int SupportInsFams;
-    typedef int SupportInsSets;
+    typedef int SupportInfam;
+    typedef int SupportInset;
 
 // The supported instruction sets are defined using the INSTRUCTIONS_SETS macro.
 // Custom INSTRUCTIONS_SETS can be used. Due to the limited number of bits in one-hot encoding,
@@ -203,20 +203,75 @@ namespace CU {
 //     Description: Function that returns a string description of 
 //     the current configuration generated according to INSTRUCTIONS_SETS
 // 
-//  8) struct CPUConfiguration {
+//  8) static inline int get_insets_count_for_infam(InstructionsFamily infam)
+//     Description: Function that returns the number of sets in the family
+// 
+//  9) struct CPUConfiguration {
 //          std::string m_vendor = "";
 //          std::string m_model = "";
-//          SupportInsFams m_supported_families = 0;
-//          SupportInsSets m_supported_sets[E_INFAM_COUNT] = {};
+//          SupportInfam m_supported_families = 0;
+//          SupportInset m_supported_sets[E_INFAM_COUNT] = {};
 //     };
-//     Description: TODO
+//     Description: Structure describing the configuration of the processor.
+//     Fields m_supported_families and m_supported_sets represent the disjunction
+//     of support flags for all supported families and sets respectively.
+// 
+// 10) static CPUConfiguration read_cpu_configuration()
+//     Description: Function that returns configuration of the processor
+//     on which the program is currently running.
 // 
 
+    static inline InstructionsFamily get_inset_family(InstructionsSet inset) {
+        return inset >> 16;
+    }
 
-std::ostream& operator<<(std::ostream& os, const CPUConfiguration& cpu_conf) {
-    return os << "CPU Vendor: " << cpu_conf.m_vendor << std::endl << \
-        "CPU Model: " << cpu_conf.m_model << std::endl;
+    static inline int get_inset_index(InstructionsSet inset) {
+        return inset & 0xFFFF;
+    }
 
-    // TODO: supported features
-}
+    static inline SupportInfam get_infam_support_flag(InstructionsFamily infam) {
+        return 1 << infam;
+    }
+
+    static inline SupportInfam get_inset_support_flag(InstructionsSet inset) {
+        return 1 << get_inset_index(inset);
+    }
+
+    static inline bool is_infam_supported(const CPUConfiguration& conf, InstructionsFamily infam) {
+        return conf.m_supported_families & get_infam_support_flag(infam);
+    }
+
+    static inline bool is_inset_supported(const CPUConfiguration& conf, InstructionsSet inset) {
+        InstructionsFamily infam = get_inset_family(inset);
+        if (!is_infam_supported(conf, infam))
+            return false;
+
+        return conf.m_supported_sets[infam] & get_inset_support_flag(inset);
+    }
+
+    static inline const char* get_infam_name(InstructionsFamily infam) {
+        return STR_INSTRUCTIONS_FAMILY[infam];
+    }
+
+    static inline const char* get_inset_name(InstructionsSet inset) {
+        return STR_INSTRUCTIONS_SETS[get_inset_family(inset)][get_inset_index(inset)];
+    }
+
+    static std::ostream& operator<<(std::ostream& os, const CPUConfiguration& conf) {
+        std::string features_list = "";
+        for (InstructionsFamily infam = E_INFAM_BEGIN; infam < E_INFAM_END; infam++) {
+            if (!is_infam_supported(conf, infam))
+                continue;
+            for (int inset_index = 0; inset_index < get_insets_count_for_infam(infam); inset_index++) {
+                if (conf.m_supported_sets[infam] & (1 << inset_index)) {
+                    features_list += STR_INSTRUCTIONS_SETS[infam][inset_index];
+                    features_list += " ";
+                }
+            }
+        }
+
+        return os << "CPU Vendor: " << conf.m_vendor << std::endl << \
+            "CPU Model: " << conf.m_model << std::endl << \
+            "Features: " << features_list << std::endl;
+    }
 }

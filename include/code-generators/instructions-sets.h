@@ -204,12 +204,30 @@ INSTRUCTIONS_SETS
 #undef   END_INSTRUCTIONS_FAMILY
 #undef END_INSTRUCTIONS_FAMILIES_LIST
 
+// get_insets_count_for_infam
+#define BEGIN_INSTRUCTIONS_FAMILIES_LIST \
+    static inline int get_insets_count_for_infam(InstructionsFamily infam) {
+#define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
+        if (E_INFAM_ ##FAM_NAME == infam) return E_INSET_ ##FAM_NAME ##_COUNT;
+#define         ADD_INSTRACTIONS_SET(SET_NAME, ...)
+#define     END_INSTRUCTIONS_FAMILY(FAM_NAME) 
+#define END_INSTRUCTIONS_FAMILIES_LIST \
+        return 0; \
+    }
+INSTRUCTIONS_SETS
+
+#undef BEGIN_INSTRUCTIONS_FAMILIES_LIST
+#undef   BEGIN_INSTRUCTIONS_FAMILY
+#undef     ADD_INSTRACTIONS_SET
+#undef   END_INSTRUCTIONS_FAMILY
+#undef END_INSTRUCTIONS_FAMILIES_LIST
+
 struct CPUConfiguration {
     std::string m_vendor = "";
     std::string m_model  = "";
 
-    SupportInsFams m_supported_families = 0;
-    SupportInsSets m_supported_sets[E_INFAM_COUNT] = {};
+    SupportInfam m_supported_families = 0;
+    SupportInset m_supported_sets[E_INFAM_COUNT] = {};
 };
 
 #ifndef CUSTOM_CPU_CONFIGURATION_READER
