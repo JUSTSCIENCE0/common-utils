@@ -183,12 +183,12 @@ INSTRUCTIONS_SETS
 #define     BEGIN_INSTRUCTIONS_FAMILY(FAM_NAME) \
         current_family = E_INFAM_ ##FAM_NAME; \
         res << "Instructions family ID: 0x" << \
-            std::right << std::setfill('0') << std::setw(8) << current_family << std::setfill(' ') << \
+            std::right << std::setfill('0') << std::setw(8) << int(current_family) << std::setfill(' ') << \
             " NAME: " << std::left << std::setw(width + 1) << STR_INSTRUCTIONS_FAMILY[current_family] << \
             " SUPPORT_FLAG: " << std::bitset<MAX_ELEMENTS_COUNT>(E_INFAM_SUPPORT_FLAG_ ##FAM_NAME) << "\n";
 #define         ADD_INSTRACTIONS_SET(SET_NAME, ...) \
         res << "Instructions set    ID: 0x" << \
-            std::right << std::setfill('0') << std::setw(8) << E_INSET_ ##SET_NAME << std::setfill(' ') << \
+            std::right << std::setfill('0') << std::setw(8) << int( E_INSET_ ##SET_NAME) << std::setfill(' ') << \
             " NAME: " << std::left << std::setw(width + 1) << STR_INSTRUCTIONS_SETS[current_family][E_INSET_ ##SET_NAME & 0xFFFF] << \
             " SUPPORT_FLAG: " << std::bitset<MAX_ELEMENTS_COUNT>(E_INSET_SUPPORT_FLAG_ ##SET_NAME) << "\n";
 #define     END_INSTRUCTIONS_FAMILY(FAM_NAME) \
@@ -234,7 +234,9 @@ struct CPUConfiguration {
 
 #ifdef  CU_ARCH_X86_64
 
-#ifdef   _MSC_VER
+#if defined(_MSC_VER) || \
+    defined(__GNUC__) || \
+    defined(__GNUG__)
 // see https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex
 
 #define READ_REGISTERS \
@@ -254,11 +256,12 @@ struct CPUConfiguration {
     } \
     __cpuid(cpu_descr.data(), 0x80000000);\
     int fID_ext_number = cpu_descr[0]; \
-    if (fID_ext_number >= 0x80000001) {\
+    if (fID_ext_number >= int(0x80000001)) {\
         __cpuidex(cpu_descr.data(), 0x80000001, 0); \
         registers_values["EXT_1_0"] = cpu_descr; \
     }
-#endif // _MSC_VER
+#endif // MSVC or GCC
+
 #endif // CU_ARCH_X86_64
 
 #define EAX 0

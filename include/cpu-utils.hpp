@@ -13,11 +13,24 @@
 #include <sstream>
 #include <iomanip>
 #include <bitset>
+#include <cstring>
 
 #ifdef CU_ARCH_X86_64
-#ifdef  _MSC_VER
+
+#if  defined(_MSC_VER)
 #include <intrin.h>
-#endif // _MSC_VER
+#endif // MSVC
+
+#if  defined(__GNUC__) || defined(__GNUG__)
+#include <cpuid.h>
+
+#undef __cpuid
+static inline void __cpuid(int cpuInfo[4], int function_id) {
+    uint* _cpu_info = reinterpret_cast<uint*>(cpuInfo);
+    __get_cpuid(function_id, &_cpu_info[0], &_cpu_info[1], &_cpu_info[2], &_cpu_info[3]);
+}
+#endif // GCC
+
 #endif // CU_ARCH_X86_64
 
 namespace CU {
@@ -48,7 +61,7 @@ namespace CU {
 //      END_INSTRUCTIONS_FAMILY(FAMILY_1)
 //  END_INSTRUCTIONS_FAMILIES_LIST
 // 
-// TODO: PLATFORM_SPECIFIC_HANDLERS
+// TODO: CUSTOM_CPU_CONFIGURATION_READER and PLATFORM_SPECIFIC_HANDLERS
 //
 
 #ifndef INSTRUCTIONS_SETS
@@ -101,7 +114,10 @@ namespace CU {
 #ifndef CUSTOM_CPU_CONFIGURATION_READER
 
 #ifdef  CU_ARCH_X86_64
-#ifdef   _MSC_VER
+#if defined(_MSC_VER) || \
+    defined(__GNUC__) || \
+    defined(__GNUG__) // TODO: Clang
+
 // see https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex
 
     static inline std::string get_cpu_vendor() {
@@ -126,7 +142,7 @@ namespace CU {
     static inline std::string get_cpu_model() {
         std::array<int, 4> cpu_descr;
         __cpuid(cpu_descr.data(), 0x80000000);
-        if (cpu_descr[0] < 0x80000004)
+        if (cpu_descr[0] < int(0x80000004))
             return "Not defined";
 
         char brand[49] = "";
@@ -136,7 +152,8 @@ namespace CU {
 
         return brand;
     }
-#endif // _MSC_VER
+#endif // MSVC or GCC
+
 #endif // CU_ARCH_X86_64
 
 #endif // !CUSTOM_CPU_CONFIGURATION_READER
