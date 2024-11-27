@@ -48,7 +48,7 @@ target_sources(common-utils
         include/cpu-utils.hpp
     PRIVATE
         include/code-generators/instructions-sets.h
-        src/cpu-utils.cpp
+        src/log-utils.cpp
 )
 target_include_directories(common-utils
     PUBLIC
