@@ -238,6 +238,8 @@ namespace CU {
 //     on which the program is currently running.
 // 
 
+    static const CPUConfiguration CURRENT_CPU_CONFIGURATION = read_cpu_configuration();
+
     static inline InstructionsFamily get_inset_family(InstructionsSet inset) {
         return inset >> 16;
     }
@@ -290,5 +292,9 @@ namespace CU {
         return os << "CPU Vendor: " << conf.m_vendor << std::endl << \
             "CPU Model: " << conf.m_model << std::endl << \
             "Features: " << features_list << std::endl;
+    }
+
+    static inline bool is_inset_supported(InstructionsSet inset) {
+        return is_inset_supported(CURRENT_CPU_CONFIGURATION, inset);
     }
 }
