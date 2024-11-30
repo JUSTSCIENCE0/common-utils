@@ -50,9 +50,21 @@ target_sources(common-utils
         include/code-generators/instructions-sets.h
         src/log-utils.cpp
 )
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_sources(common-utils
+        PRIVATE
+            src/getopt.h
+            src/getopt_long.c
+    )
+endif() # MSVC
+
 target_include_directories(common-utils
     PUBLIC
-        include/)
+        include/
+    PRIVATE
+        src/
+)
 
 # CPU identifiers
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
