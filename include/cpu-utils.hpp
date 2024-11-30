@@ -61,7 +61,11 @@ namespace CU {
 //      END_INSTRUCTIONS_FAMILY(FAMILY_1)
 //  END_INSTRUCTIONS_FAMILIES_LIST
 // 
-// TODO: CUSTOM_CPU_CONFIGURATION_READER and PLATFORM_SPECIFIC_HANDLERS
+// The user can define a custom function to read the current CPU configuration
+// in the define CUSTOM_CPU_CONFIGURATION_READER. A function with the following
+// signature is expected: CPUConfiguration read_cpu_configuration().
+// In this function, the user can utilize PLATFORM_SPECIFIC_HANDLERS specific
+// to the defined INSTRUCTION_SETS.
 //
 
 #ifndef INSTRUCTIONS_SETS
@@ -233,6 +237,7 @@ namespace CU {
 //     Fields m_supported_families and m_supported_sets represent the disjunction
 //     of support flags for all supported families and sets respectively.
 // 
+// If CUSTOM_CPU_CONFIGURATION_READER is not defined, also read_cpu_configuration() will be generated:
 // 10) static CPUConfiguration read_cpu_configuration()
 //     Description: Function that returns configuration of the processor
 //     on which the program is currently running.
