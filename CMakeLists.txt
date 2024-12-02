@@ -81,7 +81,7 @@ source_group("Implementation" FILES ${IMPLEMENTATION})
 target_include_directories(common-utils
     PUBLIC
         include/
-        include/implementations/
+        include/external/
 )
 
 # CPU identifiers
