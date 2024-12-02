@@ -42,28 +42,46 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+set(INTERFACE_HEADERS
+    include/cpu-utils.hpp
+    include/cli-utils.hpp
+)
+
+set(IMPLEMENTATION
+    include/code-generators/instructions-sets.h
+    include/code-generators/cli-parsers.h
+    src/log-utils.cpp
+)
+
 add_library(common-utils STATIC)
 target_sources(common-utils
     PUBLIC
-        include/cpu-utils.hpp
+        ${INTERFACE_HEADERS}
     PRIVATE
-        include/code-generators/instructions-sets.h
-        src/log-utils.cpp
+        ${IMPLEMENTATION}
 )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(EXTERNAL
+        include/external/getopt.h
+        src/external/getopt_long.c
+    )
+
     target_sources(common-utils
         PRIVATE
-            src/getopt.h
-            src/getopt_long.c
+            ${EXTERNAL}
     )
+
+    source_group("External" FILES ${EXTERNAL})
 endif() # MSVC
+
+source_group("Interface" FILES ${INTERFACE_HEADERS})
+source_group("Implementation" FILES ${IMPLEMENTATION})
 
 target_include_directories(common-utils
     PUBLIC
         include/
-    PRIVATE
-        src/
+        include/implementations/
 )
 
 # CPU identifiers
