@@ -6,3 +6,7 @@
 #pragma once
 
 // do not use separately from cli-utils.hpp
+
+#ifndef CLI_CONFIGURATION
+#error "CLI configuration is not defined"
+#endif
