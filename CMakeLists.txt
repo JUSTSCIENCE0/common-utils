@@ -20,7 +20,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options(
         # warnings options
         /W4 /WX
-        /wd4505
+        /wd4505 /wd4100
         /DUNICODE /D_UNICODE  # use unicode
         /MP                   # multiple processes build
     )
