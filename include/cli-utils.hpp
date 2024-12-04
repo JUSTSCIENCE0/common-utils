@@ -94,7 +94,16 @@ namespace CU {
         return validator.CheckValue(value);
     }
 
-// TODO: template specializations for additional functional
+    // HEX parsing
+    struct HEX {
+        uint64_t value;
+        HEX(uint64_t val = 0) : value(val) {}
+        operator uint64_t() const { return value; }
+    };
+    std::istream& operator>>(std::istream& is, HEX& hex) {
+        is >> std::hex >> hex.value;
+        return is;
+    }
 
 // preprocessor magic works here
 #include "code-generators/cli-parsers.h"
