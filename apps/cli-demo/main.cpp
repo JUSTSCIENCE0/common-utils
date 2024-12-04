@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     if (argc < 2)
         return -1;
 
-    using arg_type = long double;
+    using arg_type = std::string;
     std::vector<arg_type> values(argc - 1);
 
     for (int i = 0; i < argc - 1; i++) {
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
         std::cout << "Value: " << values[i] << std::endl;
 
-        if (!CU::validate_option(values[i], CU::RangeValidator<arg_type>(0, 50))) {
+        if (!CU::validate_option(values[i], CU::ListValidator<arg_type>({ "0", "- 34", "50" }))) {
             std::cout << "Validation error" << std::endl;
         }
 

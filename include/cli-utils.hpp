@@ -11,6 +11,8 @@
 #include <sstream>
 #include <iostream>
 #include <concepts>
+#include <list>
+#include <initializer_list>
 
 namespace CU {
 // TODO: doc - CLI_CONFIGURATION interface
@@ -33,9 +35,14 @@ namespace CU {
 
     // validation
     template <typename OptionType>
+    concept StreamInsertable = requires(std::ostream& os, OptionType value) {
+        { os << value } -> std::same_as<std::ostream&>;
+    };
+    template <StreamInsertable OptionType>
     class BaseValidator {
     public:
         virtual bool CheckValue(const OptionType& value) const { return true; }
+        // TODO: add validator description
     };
 
     // validator that checks if a value is within the range [min, max]
@@ -54,10 +61,27 @@ namespace CU {
         bool CheckValue(const OptionType& value) const override {
             return (m_min <= value) && (value <= m_max);
         }
-
+        // TODO: add validator description
     private:
         const OptionType m_min;
         const OptionType m_max;
+    };
+
+    // validator that checks if a value is present in a predefined list
+    template <std::equality_comparable OptionType>
+    class ListValidator final :
+        public BaseValidator<OptionType> {
+    public:
+        ListValidator(std::initializer_list<OptionType> valid_options) :
+            m_valid_options(valid_options) {}
+
+        bool CheckValue(const OptionType& value) const override {
+            return m_valid_options.end() !=
+                std::find(m_valid_options.begin(), m_valid_options.end(), value);
+        }
+        // TODO: add validator description
+    private:
+        const std::list<OptionType> m_valid_options;
     };
 
 #ifdef CUSTOM_VALIDATORS
