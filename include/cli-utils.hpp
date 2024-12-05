@@ -7,6 +7,7 @@
 
 #include <getopt.h>
 
+#include <string>
 #include <cassert>
 #include <sstream>
 #include <iostream>
@@ -17,8 +18,13 @@
 namespace CU {
 // TODO: doc - CLI_CONFIGURATION interface
 //
-//  CLI_FLAG( STR_NAME, IDENTIFIER )
-//  CLI_OPTION( STR_NAME, IDENTIFIER, USAGE_MODE, TYPE, VALIDATOR )
+//  CLI_FLAG( FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION )
+//  CLI_VALUABLE_FLAG( FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, VALIDATOR )
+//  CLI_OPTIONAL_PROPERTY( FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, VALIDATOR )
+//  CLI_REQUIRED_PROPERTY( FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, VALIDATOR )
+// 
+//  SYMBOL(s)
+//  WO_SYMBOL
 //
 #ifndef CLI_CONFIGURATION
 // TODO: default CLI_CONFIGURATION
@@ -38,6 +44,8 @@ namespace CU {
     }
 
     // validation
+
+    // validator without any limitations
     template <typename OptionType>
     concept StreamInsertable = requires(std::ostream& os, OptionType value) {
         { os << value } -> std::same_as<std::ostream&>;
