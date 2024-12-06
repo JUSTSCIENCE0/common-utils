@@ -6,9 +6,9 @@
 #define CLI_CONFIGURATION \
     CLI_FLAG(test-flag1, SYMBOL(f), test_flag1, "first test flag")  \
     CLI_FLAG(test-flag2, WO_SYMBOL, test_flag2, "second test flag") \
-    CLI_VALUABLE_FLAG(val-flag, WO_SYMBOL, val_flag, "test flag with optional value", int, BaseValidator()) \
+    CLI_VALUABLE_FLAG(val-flag, WO_SYMBOL, val_flag, "test flag with optional value", int, 10, BaseValidator()) \
     CLI_OPTIONAL_PROPERTY(optional-prop, SYMBOL(o), optional_prop, "test optional property", \
-        float, RangeValidator(-1.0f, 1.0f)) \
+        float, 0.0f, RangeValidator(-1.0f, 1.0f)) \
     CLI_REQUIRED_PROPERTY(required-prop, SYMBOL(r), required_prop, "test required property", \
         std::string, ListValidator({ "123", "abc", "qwe" }) )
 
@@ -17,7 +17,7 @@
 #include <vector>
 
 int main(int argc, char* argv[]) {
-    std::cout << CU::generate_optstring() << std::endl;
+    std::cout << CU::PrivateImplementation::generate_optstring() << std::endl;
 
     if (argc < 2)
         return -1;
