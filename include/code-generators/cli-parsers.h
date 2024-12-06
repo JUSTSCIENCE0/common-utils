@@ -62,8 +62,6 @@ namespace PrivateImplementation {
 #undef CLI_REQUIRED_PROPERTY
 
     option OptionDescriptions[] = {
-#define SYMBOL(s)
-#define WO_SYMBOL
 #define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
         { #FULL_NAME, no_argument, NULL, E_ ##IDENTIFIER },
 #define CLI_VALUABLE_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
@@ -75,10 +73,9 @@ namespace PrivateImplementation {
 
         CLI_CONFIGURATION
         { "help", no_argument, NULL, E_HELP },
+        { 0, 0, 0, 0 }
     };
 
-#undef SYMBOL
-#undef WO_SYMBOL
 #undef CLI_FLAG
 #undef CLI_VALUABLE_FLAG
 #undef CLI_OPTIONAL_PROPERTY
@@ -87,8 +84,6 @@ namespace PrivateImplementation {
 } // namespace PrivateCLIImplementation
 
 struct CLIConfig {
-#define SYMBOL(s)
-#define WO_SYMBOL
 #define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
     bool IDENTIFIER = false;
 #define CLI_VALUABLE_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, DEFAULT, ...) \
@@ -102,8 +97,76 @@ struct CLIConfig {
     CLI_CONFIGURATION
 };
 
-#undef SYMBOL
-#undef WO_SYMBOL
+#undef CLI_FLAG
+#undef CLI_VALUABLE_FLAG
+#undef CLI_OPTIONAL_PROPERTY
+#undef CLI_REQUIRED_PROPERTY
+
+static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
+    using namespace PrivateImplementation;
+
+    // required options handlers
+#define CLI_FLAG(...)
+#define CLI_VALUABLE_FLAG(...)
+#define CLI_OPTIONAL_PROPERTY(...)
+#define CLI_REQUIRED_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, ...) \
+    std::optional<TYPE> required_ ##IDENTIFIER = std::nullopt;
+    CLI_CONFIGURATION
+#undef CLI_FLAG
+#undef CLI_VALUABLE_FLAG
+#undef CLI_OPTIONAL_PROPERTY
+#undef CLI_REQUIRED_PROPERTY
+    int option_index = 0;
+
+    while (true) {
+        int option_id = getopt_long(
+            argc, argv, 
+            generate_optstring().c_str(),
+            OptionDescriptions,
+            &option_index);
+        if (-1 == option_id) break;
+
+        switch (option_id) {
+#define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        case E_ ##IDENTIFIER: \
+            config->IDENTIFIER = true; \
+            break;
+#define CLI_VALUABLE_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        case E_ ##IDENTIFIER: \
+            config->has_ ##IDENTIFIER = true; \
+            if (optarg) { \
+                if (!parse_option(optarg, &config->IDENTIFIER)) { \
+                    return false; /* TODO: print error */\
+                } \
+            } \
+            break;
+#define CLI_OPTIONAL_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        case E_ ##IDENTIFIER: \
+            if (!parse_option(optarg, &config->IDENTIFIER)) { \
+                return false; /* TODO: print error */\
+            } \
+            break;
+#define CLI_REQUIRED_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        case E_ ##IDENTIFIER: \
+            /* TODO */ \
+            break;
+
+            CLI_CONFIGURATION
+        case '?':
+            // TODO: print error
+            return false;
+        default:
+            // TODO: print error
+            return false;
+        } // switch
+    } // while
+
+
+
+
+    return true;
+} // parse_cli_args
+
 #undef CLI_FLAG
 #undef CLI_VALUABLE_FLAG
 #undef CLI_OPTIONAL_PROPERTY

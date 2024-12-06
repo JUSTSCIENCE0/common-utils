@@ -14,6 +14,7 @@
 #include <concepts>
 #include <list>
 #include <initializer_list>
+#include <optional>
 
 namespace CU {
 // TODO: doc - CLI_CONFIGURATION interface
@@ -33,9 +34,9 @@ namespace CU {
 
     // parsing
     template <typename OptionType>
-    bool parse_option(const char* in_option, OptionType& out_value) {
+    bool parse_option(const char* in_option, OptionType* out_value) {
         std::stringstream parser(in_option);
-        parser >> out_value;
+        parser >> *out_value;
 
         if (!parser.eof() || parser.fail())
             return false;
@@ -63,8 +64,8 @@ namespace CU {
         public BaseValidator<OptionType> {
     public:
         RangeValidator(
-            OptionType min,
-            OptionType max) :
+            const OptionType& min,
+            const OptionType& max) :
             m_min(min),
             m_max(max) {
             assert(min < max);

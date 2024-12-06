@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
         const char* current_arg = argv[i + 1];
         std::cout << "Argument: \"" << current_arg << "\"" << std::endl;
 
-        if (!CU::parse_option(current_arg, values[i])) {
+        if (!CU::parse_option(current_arg, &values[i])) {
             std::cout << "Parse error" << std::endl;
         }
 
