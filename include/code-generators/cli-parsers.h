@@ -14,7 +14,10 @@
 namespace PrivateImplementation {
 
     enum E_OPTIONS {
-#define SYMBOL(s) = #s[0]
+#define SYMBOL(s) = #s[0], E_ ##s ##_NEXT_VAL = 256 + #s[0]
+// An additional enum is required because:
+// 1) It allows detecting duplicate symbolic options during the creation of E_OPTIONS.
+// 2) It helps avoid collisions between auto-incremented enum values and symbolic characters.
 #define WO_SYMBOL
 #define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
         E_ ##IDENTIFIER SHORT_NAME,
