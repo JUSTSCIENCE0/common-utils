@@ -54,7 +54,7 @@ namespace CU {
     class BaseValidator {
     public:
         virtual bool CheckValue(const OptionType& value) const { return true; }
-        virtual std::string GetDescription() const {
+        virtual std::string GetDescription(std::string prefix = "") const {
             return "there are no restrictions applied to the value";
         }
     };
@@ -75,7 +75,7 @@ namespace CU {
         bool CheckValue(const OptionType& value) const override {
             return (m_min <= value) && (value <= m_max);
         }
-        std::string GetDescription() const override {
+        std::string GetDescription(std::string prefix = "") const override {
             std::stringstream result;
             result << "value must be within the range [" << m_min << ", " << m_max << "]";
             return result.str();
@@ -97,11 +97,11 @@ namespace CU {
             return m_valid_options.end() !=
                 std::find(m_valid_options.begin(), m_valid_options.end(), value);
         }
-        std::string GetDescription() const override {
+        std::string GetDescription(std::string prefix = "") const override {
             std::stringstream result;
             result << "value must match one of the following:";
             for (auto value : m_valid_options) {
-                result << "\n - '" << value << "';";
+                result << "\n" << prefix << " - '" << value << "';";
             }
             return result.str();
         }
