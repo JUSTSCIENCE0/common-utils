@@ -10,7 +10,7 @@
     CLI_OPTIONAL_PROPERTY(optional-prop, SYMBOL(o), optional_prop, "test optional property", \
         float, 0.0f, RangeValidator, -1.0f, 1.0f ) \
     CLI_REQUIRED_PROPERTY(required-prop, SYMBOL(r), required_prop, "test required property", \
-        std::string, ListValidator, { "123", "abc", "qwe" } )
+        std::string, ListValidator, "123", "abc", "qwe" )
 
 #include "cli-utils.hpp"
 

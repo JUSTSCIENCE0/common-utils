@@ -136,30 +136,33 @@ static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
             config->has_ ##IDENTIFIER = true; \
             if (optarg) { \
                 if (!parse_option(optarg, &config->IDENTIFIER)) { \
-                    return false; /* TODO: print error */\
+                    std::cerr << "flag '" #FULL_NAME "' " \
+                                 "has invalid option -- " << optarg << std::endl; \
+                    return false; \
                 } \
             } \
             break;
 #define CLI_OPTIONAL_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
         case E_ ##IDENTIFIER: \
             if (!parse_option(optarg, &config->IDENTIFIER)) { \
-                return false; /* TODO: print error */\
+                std::cerr << "option '" #FULL_NAME "' " \
+                             "has invalid value -- " << optarg << std::endl; \
+                return false; \
             } \
             break;
 #define CLI_REQUIRED_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, ...) \
         case E_ ##IDENTIFIER: { \
             if (!parse_option(optarg, &config->IDENTIFIER)) { \
-                return false; /* TODO: print error */\
+                std::cerr << "option '" #FULL_NAME "' " \
+                             "has invalid value -- " << optarg << std::endl; \
+                return false; \
             } \
             has_ ##IDENTIFIER = true; \
             break; \
         }
             CLI_CONFIGURATION
         case '?':
-            // TODO: print error
-            return false;
         default:
-            // TODO: print error
             return false;
         } // switch
     } // while
@@ -174,7 +177,7 @@ static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
 #define CLI_OPTIONAL_PROPERTY(...)
 #define CLI_REQUIRED_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
     if (!has_ ##IDENTIFIER) { \
-        /* TODO: print error */ \
+        std::cerr << "mandatory option is missing -- " #FULL_NAME << std::endl; \
         return false; \
     }
     CLI_CONFIGURATION
@@ -184,10 +187,13 @@ static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
 #undef CLI_REQUIRED_PROPERTY
 
     // validate options
-#define VALIDATE(FULL_NAME, IDENTIFIER, TYPE, VALIDATOR, ...) \
-    if (!validate_option( config->IDENTIFIER, VALIDATOR<TYPE>(__VA_ARGS__) )) { \
-        /* TODO: print error */ \
+#define VALIDATE(FULL_NAME, IDENTIFIER, TYPE, VALIDATOR, ...) { \
+    VALIDATOR<TYPE> validator{__VA_ARGS__}; \
+    if (!validate_option(config->IDENTIFIER, validator)) { \
+        std::cerr << #FULL_NAME " -- value '" << config->IDENTIFIER << "' don't pass validation" << std::endl; \
+        std::cerr << validator.GetDescription(); \
         return false; \
+        } \
     }
 
 #define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION)

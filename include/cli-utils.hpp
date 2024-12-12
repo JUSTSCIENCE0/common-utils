@@ -54,7 +54,9 @@ namespace CU {
     class BaseValidator {
     public:
         virtual bool CheckValue(const OptionType& value) const { return true; }
-        // TODO: add validator description
+        virtual std::string GetDescription() const {
+            return "there are no restrictions applied to the value";
+        }
     };
 
     // validator that checks if a value is within the range [min, max]
@@ -73,7 +75,11 @@ namespace CU {
         bool CheckValue(const OptionType& value) const override {
             return (m_min <= value) && (value <= m_max);
         }
-        // TODO: add validator description
+        std::string GetDescription() const override {
+            std::stringstream result;
+            result << "value must be within the range [" << m_min << ", " << m_max << "]";
+            return result.str();
+        }
     private:
         const OptionType m_min;
         const OptionType m_max;
@@ -91,7 +97,14 @@ namespace CU {
             return m_valid_options.end() !=
                 std::find(m_valid_options.begin(), m_valid_options.end(), value);
         }
-        // TODO: add validator description
+        std::string GetDescription() const override {
+            std::stringstream result;
+            result << "value must match one of the following:";
+            for (auto value : m_valid_options) {
+                result << "\n - '" << value << "';";
+            }
+            return result.str();
+        }
     private:
         const std::list<OptionType> m_valid_options;
     };
