@@ -14,6 +14,7 @@
 #include <concepts>
 #include <list>
 #include <initializer_list>
+#include <filesystem>
 
 namespace CU {
 // TODO: doc - CLI_CONFIGURATION interface
@@ -27,7 +28,6 @@ namespace CU {
 //  WO_SYMBOL
 //
 #ifndef CLI_CONFIGURATION
-// TODO: default CLI_CONFIGURATION
 #define CLI_CONFIGURATION
 #endif // !CLI_CONFIGURATION
 
@@ -112,7 +112,7 @@ namespace CU {
 #ifdef CUSTOM_VALIDATORS
     // TODO: doc - CUSTOM_VALIDATORS
     CUSTOM_VALIDATORS
-#endif CUSTOM_VALIDATORS
+#endif // CUSTOM_VALIDATORS
 
     template <typename OptionType>
     bool validate_option(const OptionType& value, const BaseValidator<OptionType>& validator) {

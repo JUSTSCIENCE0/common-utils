@@ -64,6 +64,33 @@ namespace PrivateImplementation {
 #undef CLI_OPTIONAL_PROPERTY
 #undef CLI_REQUIRED_PROPERTY
 
+    static std::string get_usage(const char* bin_path) {
+        std::string result = "usage:\n";
+
+        using path = std::filesystem::path;
+        result += path(bin_path).stem().string() + " [-h|--help] ";
+
+#define SYMBOL(s) "-" #s "|"
+#define WO_SYMBOL
+#define CLI_FLAG(FULL_NAME, SHORT_NAME, ...) \
+        result += "[" SHORT_NAME "--" #FULL_NAME "] ";
+#define CLI_VALUABLE_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, ...) \
+        result += "[" SHORT_NAME "--" #FULL_NAME "[=<" #TYPE " " #IDENTIFIER ">]] ";
+#define CLI_OPTIONAL_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, ...) \
+        result += "[" SHORT_NAME "--" #FULL_NAME "=<" #TYPE " " #IDENTIFIER ">] ";
+#define CLI_REQUIRED_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, DESCRIPTION, TYPE, ...) \
+        result +=     SHORT_NAME "--" #FULL_NAME "=<" #TYPE " " #IDENTIFIER "> ";
+
+        CLI_CONFIGURATION
+        return result;
+    }
+#undef SYMBOL
+#undef WO_SYMBOL
+#undef CLI_FLAG
+#undef CLI_VALUABLE_FLAG
+#undef CLI_OPTIONAL_PROPERTY
+#undef CLI_REQUIRED_PROPERTY
+
     option OptionDescriptions[] = {
 #define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
         { #FULL_NAME, no_argument, NULL, E_ ##IDENTIFIER },
@@ -83,6 +110,14 @@ namespace PrivateImplementation {
 #undef CLI_VALUABLE_FLAG
 #undef CLI_OPTIONAL_PROPERTY
 #undef CLI_REQUIRED_PROPERTY
+
+    static std::string get_help(const char* bin_path) {
+        std::stringstream result(get_usage(bin_path));
+
+        // TODO: arguments descriptions
+
+        return result.str();
+    }
 
 } // namespace PrivateCLIImplementation
 
@@ -106,6 +141,11 @@ struct CLIConfig {
 #undef CLI_REQUIRED_PROPERTY
 
 static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
+    if (argc < 1 || !argv) {
+        std::cerr << "invalid arguments" << std::endl;
+        return false;
+    }
+
     using namespace PrivateImplementation;
 
     // required options handlers
@@ -164,6 +204,9 @@ static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
             break; \
         }
             CLI_CONFIGURATION
+        case E_HELP:
+            std::cout << get_help(argv[0]) << std::endl;
+            return false;
         case '?':
         default:
             return false;
