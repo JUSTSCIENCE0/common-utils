@@ -62,6 +62,9 @@ namespace CU {
 //          float, 0.0f, RangeValidator, -1.0f, 1.0f ) \
 //      CLI_REQUIRED_PROPERTY(required-prop, SYMBOL(r), required_prop, "test required property", \ /* --required-prop | -r */
 //          std::string, ListValidator, "123", "abc", "qwe" )
+// 
+// Regardless of the flags/properties specified in CLI_CONFIGURATION, additional handling for the --help or -h flag is generated.
+// When this flag is entered, help information is displayed.
 //
 
 #ifndef CLI_CONFIGURATION
@@ -151,7 +154,7 @@ namespace CU {
     };
 
 #ifdef CUSTOM_VALIDATORS
-    // TODO: doc - CUSTOM_VALIDATORS
+    // The user can define their own validator class analogously in the CUSTOM_VALIDATORS macro, and its code will be inserted here.
     CUSTOM_VALIDATORS
 #endif // CUSTOM_VALIDATORS
 
@@ -174,5 +177,24 @@ namespace CU {
 // preprocessor magic works here
 #include "code-generators/cli-parsers.h"
 
-// TODO: doc - generation
+// for the given CLI_CONFIGURATION the following objects are generated:
+//  1) struct CLIConfig {
+//         bool FLAG_IDENTIFIER = false;
+//         bool has_VAL_FLAG_IDENTIFIER = false;
+//         TYPE VAL_FLAG_IDENTIFIER = DEFAULT;
+//         TYPE OPTIONAL_IDENTIFIER = DEFAULT;
+//         TYPE REQUIRED_IDENTIFIER;
+//         ...
+//     };
+//     Description: A structure containing the values of all options and properties specified in the CLI_CONFIGURATION.
+// 
+//  2) static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config)
+//     Description: A function that parses user command-line arguments into the CLIConfig structure.
+//     Arguments:
+//     - argc - An integer that contains the count of arguments that follow in argv.
+//     - argv - An array of null - terminated strings representing command - line arguments entered by the user of the program.
+//     - config - The resulting output config.
+//     The function returns true if all arguments are successfully parsed and false if there is an input error or 
+//     the user requested help with the --help or -h flag.
+//
 }

@@ -149,7 +149,7 @@ namespace PrivateImplementation {
 #undef CLI_VALUABLE_FLAG
 #undef CLI_OPTIONAL_PROPERTY
 #undef CLI_REQUIRED_PROPERTY
-} // namespace PrivateCLIImplementation
+} // namespace PrivateImplementation
 
 struct CLIConfig {
 #define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
