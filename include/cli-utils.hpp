@@ -15,6 +15,7 @@
 #include <list>
 #include <initializer_list>
 #include <filesystem>
+#include <algorithm>
 
 namespace CU {
 // To define the properties and flags of your command-line interface, you need to define the macro CLI_CONFIGURATION.
@@ -53,13 +54,13 @@ namespace CU {
 // - VALIDATOR_OPTIONS - the options of the validator, see code below.
 // 
 // Example:
-// #define CLI_CONFIGURATION \
+// #define CLI_CONFIGURATION
 //      CLI_FLAG(test-flag1, SYMBOL(f), test_flag1, "first test flag")  \ /* --test-flag1 | -f */
 //      CLI_FLAG(test-flag2, WO_SYMBOL, test_flag2, "second test flag") \ /* --test-flag2 */
 //      CLI_VALUABLE_FLAG(val-flag, WO_SYMBOL, val_flag, "test flag with optional value", \ /* --val-flag */
-//          int, 10, BaseValidator) \
+//          int, 10, BaseValidator)
 //      CLI_OPTIONAL_PROPERTY(optional-prop, SYMBOL(o), optional_prop, "test optional property", \ /* --optional-prop | -o */
-//          float, 0.0f, RangeValidator, -1.0f, 1.0f ) \
+//          float, 0.0f, RangeValidator, -1.0f, 1.0f )
 //      CLI_REQUIRED_PROPERTY(required-prop, SYMBOL(r), required_prop, "test required property", \ /* --required-prop | -r */
 //          std::string, ListValidator, "123", "abc", "qwe" )
 // 
