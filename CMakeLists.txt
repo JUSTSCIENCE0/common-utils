@@ -53,6 +53,9 @@ set(IMPLEMENTATION
     src/log-utils.cpp
 )
 
+add_subdirectory(externals/googletest)
+set_property(TARGET gmock gmock_main gtest gtest_main PROPERTY FOLDER "externals")
+
 add_library(common-utils STATIC)
 target_sources(common-utils
     PUBLIC

@@ -163,6 +163,8 @@ struct CLIConfig {
     TYPE IDENTIFIER;
 
     CLI_CONFIGURATION
+
+    bool operator==(const CLIConfig&) const = default;
 };
 
 #undef CLI_FLAG
@@ -177,6 +179,10 @@ static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
     }
 
     using namespace PrivateImplementation;
+
+    // reset getopt
+    optind = 0;
+    optreset = 1;
 
     // required options handlers
 #define CLI_FLAG(...)
