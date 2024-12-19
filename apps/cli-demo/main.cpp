@@ -14,8 +14,6 @@
 
 #include "cli-utils.hpp"
 
-#include <vector>
-
 int main(int argc, char* argv[]) {
     CU::CLIConfig cli_config{};
     if (!CU::parse_cli_args(argc, argv, &cli_config))
