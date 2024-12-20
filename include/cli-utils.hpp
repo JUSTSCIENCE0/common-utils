@@ -6,7 +6,7 @@
 #pragma once
 
 #if defined(_MSC_VER)
-#include "externals/getopt.h"
+#include "external/getopt.h"
 #else
 #include <getopt.h>
 #endif // MSVC
