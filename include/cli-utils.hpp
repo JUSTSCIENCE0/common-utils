@@ -66,6 +66,9 @@ namespace CU {
 // 
 // Regardless of the flags/properties specified in CLI_CONFIGURATION, additional handling for the --help or -h flag is generated.
 // When this flag is entered, help information is displayed.
+// 
+// The user can also specify authorship and license information in the CLI_ABOUT macro.
+// This information will be displayed when help is requested with the --help or -h flag.
 //
 
 #ifndef CLI_CONFIGURATION

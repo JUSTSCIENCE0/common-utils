@@ -12,6 +12,11 @@
     CLI_REQUIRED_PROPERTY(required-prop, SYMBOL(r), required_prop, "test required property", \
         std::string, ListValidator, "123", "abc", "qwe" )
 
+#define CLI_ABOUT \
+    "Copyright (c) 2024, Yakov Usoltsev\n" \
+    "Email: yakovmen62@gmail.com\n" \
+    "License: MIT"
+
 #include "cli-utils.hpp"
 
 int main(int argc, char* argv[]) {

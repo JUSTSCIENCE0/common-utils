@@ -120,6 +120,11 @@ namespace PrivateImplementation {
         result << "    validation: " << VALIDATOR<TYPE>{__VA_ARGS__}.GetDescription("    ") << "\n";
 
         CLI_CONFIGURATION
+
+#ifdef CLI_ABOUT
+        result << "\n" << CLI_ABOUT << "\n";
+#endif //CLI_ABOUT
+
         return result.str();
     }
 
