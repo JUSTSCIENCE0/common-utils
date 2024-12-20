@@ -66,6 +66,114 @@ const ArgsSet kTestCases[] = {
         // not parsable
         false, {}
     },
+    // missed required property
+    {
+        // arguments
+        {
+            const_cast<char*>("//test/app")
+        },
+    // not parsable
+    false, {}
+},
+// required property has invalid value
+{
+    // arguments
+    {
+        const_cast<char*>("//test/app"),
+        const_cast<char*>("--required-prop=456"),
+    },
+    // not parsable
+    false, {}
+    },
+    // optional property has invalid value
+    {
+        // arguments
+        {
+            const_cast<char*>("//test/app"),
+            const_cast<char*>("--required-prop=123"),
+            const_cast<char*>("--optional-prop=2.0"),
+        },
+        // not parsable
+        false, {}
+    },
+    // valid properties, full names
+    {
+        // arguments
+        {
+            const_cast<char*>("//test/app"),
+            const_cast<char*>("--required-prop=123"),
+            const_cast<char*>("--optional-prop=0.5"),
+        },
+        true,
+        {
+            .test_flag1 = false,
+            .test_flag2 = false,
+            .has_val_flag = false,
+            .val_flag = 10,
+            .optional_prop = 0.5f,
+            .required_prop = "123"
+        }
+    },
+    // valid properties, short names
+    {
+        // arguments
+        {
+            const_cast<char*>("//test/app"),
+            const_cast<char*>("-r abc"),
+            const_cast<char*>("-o -0.5"),
+        },
+        true,
+        {
+            .test_flag1 = false,
+            .test_flag2 = false,
+            .has_val_flag = false,
+            .val_flag = 10,
+            .optional_prop = -0.5f,
+            .required_prop = "abc"
+        }
+    },
+    // valid properties and flags, mixed names
+    {
+        // arguments
+        {
+            const_cast<char*>("//test/app"),
+            const_cast<char*>("-r abc"),
+            const_cast<char*>("-o -0.5"),
+            const_cast<char*>("-f"),
+            const_cast<char*>("--test-flag2"),
+            const_cast<char*>("--val-flag"),
+        },
+        true,
+        {
+            .test_flag1 = true,
+            .test_flag2 = true,
+            .has_val_flag = true,
+            .val_flag = 10,
+            .optional_prop = -0.5f,
+            .required_prop = "abc"
+        }
+    },
+    // valid properties and flags (with value), mixed names
+    {
+        // arguments
+        {
+            const_cast<char*>("//test/app"),
+            const_cast<char*>("-r abc"),
+            const_cast<char*>("-o -0.5"),
+            const_cast<char*>("-f"),
+            const_cast<char*>("--test-flag2"),
+            const_cast<char*>("--val-flag=75"),
+        },
+        true,
+        {
+            .test_flag1 = true,
+            .test_flag2 = true,
+            .has_val_flag = true,
+            .val_flag = 75,
+            .optional_prop = -0.5f,
+            .required_prop = "abc"
+        }
+    },
 };
 
 TEST_P(ArgsTest, FullTest) {
