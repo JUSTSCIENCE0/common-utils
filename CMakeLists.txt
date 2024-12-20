@@ -27,7 +27,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 elseif ((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
     add_compile_options(
         # warnings options
-        -Wall -Wextra -Wpedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy
+        -Wall -Wextra -Wpedantic -Wcast-align -Wcast-qual
         -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op
         -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
         -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel
@@ -84,7 +84,6 @@ source_group("Implementation" FILES ${IMPLEMENTATION})
 target_include_directories(common-utils
     PUBLIC
         include/
-        include/external/
 )
 
 # CPU identifiers

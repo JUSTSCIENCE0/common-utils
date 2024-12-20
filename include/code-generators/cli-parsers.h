@@ -187,7 +187,6 @@ static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
 
     // reset getopt
     optind = 0;
-    optreset = 1;
 
     // required options handlers
 #define CLI_FLAG(...)
