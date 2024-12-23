@@ -15,6 +15,7 @@ endif()
 
 option(BUILD_CU_APPS        "Build example applications" ON)
 option(BUILD_CU_TEST        "Build tests" ON)
+option(ENABLE_CU_PROFILE    "Enable profile utils" OFF)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options(
@@ -45,6 +46,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(INTERFACE_HEADERS
     include/cpu-utils.hpp
     include/cli-utils.hpp
+    include/profile-utils.hpp
 )
 
 set(IMPLEMENTATION
@@ -89,7 +91,7 @@ target_include_directories(common-utils
 # CPU identifiers
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
     message(STATUS "CPU Architecture - ${CMAKE_SYSTEM_PROCESSOR}")
-    add_compile_definitions(CU_ARCH_X86_64)
+    target_compile_definitions(common-utils PUBLIC CU_ARCH_X86_64)
 #elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")  TODO
 #elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")      TODO
 else()
@@ -103,3 +105,7 @@ endif(BUILD_CU_APPS)
 if (BUILD_CU_TEST)
     add_subdirectory(tests)
 endif(BUILD_CU_TEST)
+
+if (ENABLE_CU_PROFILE)
+    target_compile_definitions(common-utils PUBLIC ENABLE_CU_PROFILE=1)
+endif(ENABLE_CU_PROFILE)
