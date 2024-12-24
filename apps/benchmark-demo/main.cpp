@@ -14,25 +14,22 @@ static inline void some_work() {
 }
 
 static inline void test_profile() {
-    CU_PROFILE_CHECKPOINT;
+    CU_PROFILE_CHECKBLOCK;
     some_work();
-    CU_PROFILE_CHECKPOINT;
 }
 
 int main(int argc, char* argv[]) {
     USE_CU_PROFILE;
 
-    CU_PROFILE_CHECKPOINT;
+    CU_PROFILE_CHECKBLOCK;
 
     some_work();
 
-    CU_PROFILE_CHECKPOINT;
+    CU_PROFILE_CHECKBLOCK;
 
     TestClass object;
     object.some_work();
     test_profile();
-
-    CU_PROFILE_CHECKPOINT;
 
     return 0;
 }

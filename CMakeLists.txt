@@ -98,6 +98,9 @@ else()
     message(FATAL_ERROR "Unsupported CPU Architecture - ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
 
+string(LENGTH "${CMAKE_SOURCE_DIR}" SOURCE_DIR_LENGTH)
+target_compile_definitions(common-utils PUBLIC CU_PREFIX_LENGTH=${SOURCE_DIR_LENGTH})
+
 if (BUILD_CU_APPS)
     add_subdirectory(apps)
 endif(BUILD_CU_APPS)

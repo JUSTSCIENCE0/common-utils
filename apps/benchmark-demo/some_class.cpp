@@ -10,7 +10,6 @@
 #include <thread>
 
 void TestClass::some_work() {
-    CU_PROFILE_CHECKPOINT;
+    CU_PROFILE_CHECKBLOCK;
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    CU_PROFILE_CHECKPOINT;
 }

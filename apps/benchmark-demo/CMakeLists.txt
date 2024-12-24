@@ -19,3 +19,6 @@ target_link_libraries(benchmark-demo
 )
 
 set_property(TARGET benchmark-demo PROPERTY FOLDER "apps")
+
+string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}" SOURCE_DIR_LENGTH)
+target_compile_definitions(common-utils PUBLIC CU_PREFIX_LENGTH=${SOURCE_DIR_LENGTH})
