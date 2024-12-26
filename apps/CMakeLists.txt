@@ -7,3 +7,4 @@ cmake_minimum_required(VERSION 3.22)
 
 add_subdirectory(cpu-descriptor)
 add_subdirectory(cli-demo)
+add_subdirectory(benchmark-demo)
