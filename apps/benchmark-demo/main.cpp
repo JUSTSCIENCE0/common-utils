@@ -14,18 +14,18 @@ static inline void some_work() {
 }
 
 static inline void test_profile() {
-    CU_PROFILE_CHECKBLOCK;
+    CU_PROFILE_CHECKBLOCK();
     some_work();
 }
 
 int main(int argc, char* argv[]) {
     USE_CU_PROFILE;
 
-    CU_PROFILE_CHECKBLOCK;
-
+    CU_PROFILE_CHECKBLOCK(first);
     some_work();
+    CU_STOP_CHECKBLOCK(first);
 
-    CU_PROFILE_CHECKBLOCK;
+    CU_PROFILE_CHECKBLOCK();
 
     TestClass object;
     object.some_work();

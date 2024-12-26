@@ -14,12 +14,29 @@
 #include <string>
 #include <chrono>
 
-#define USE_CU_PROFILE         do { std::cout << "USE_CU_PROFILE" << std::endl; } while(0)
-#define CU_PROFILE_CHECKBLOCK  CU::CheckBlockTimer CU_TIMER_NAME( \
-                                    std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__);
+// TODO: doc profiler interface
+// USE_CU_PROFILE
+// CU_PROFILE_CHECKBLOCK(NAME), NAME - optional
+// CU_STOP_CHECKBLOCK(NAME)
 
-#define CU_CONCAT_(a, b) a ## b
-#define CU_CONCAT(a, b) CU_CONCAT_(a, b)
+#define USE_CU_PROFILE               do { std::cout << "USE_CU_PROFILE" << std::endl; } while(0)
+#define CU_PROFILE_CHECKBLOCK(...)   CU_CHECKBLOCK_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define CU_STOP_CHECKBLOCK(NAME)     NAME ##_timer.Stop()
+
+// preproccessor magic
+#define CU_FUNC_CHOOSER(_f1, _f2, ...) _f2
+#define CU_FUNC_RECOMPOSER(argsWithParentheses) CU_FUNC_CHOOSER argsWithParentheses
+#define CU_CHOOSE_FROM_ARG_COUNT(...) CU_FUNC_RECOMPOSER((__VA_ARGS__, CU_PROFILE_CHECKBLOCK_NAMED, ))
+#define CU_NO_ARG_EXPANDER() ,CU_PROFILE_CHECKBLOCK_ANONYMOUS
+#define CU_CHECKBLOCK_MACRO_CHOOSER(...) CU_CHOOSE_FROM_ARG_COUNT(CU_NO_ARG_EXPANDER __VA_ARGS__ ())
+
+#define CU_PROFILE_CHECKBLOCK_ANONYMOUS()   CU::CheckBlockTimer CU_TIMER_NAME( "", \
+                                            std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__);
+#define CU_PROFILE_CHECKBLOCK_NAMED(NAME)  CU::CheckBlockTimer NAME ##_timer( std::string(#NAME) + ": ", \
+                                        std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__);
+
+#define CU_CONCAT_(lhs, rhs) lhs ## rhs
+#define CU_CONCAT(lhs, rhs) CU_CONCAT_(lhs, rhs)
 #define CU_TIMER_NAME CU_CONCAT(timer_, __LINE__)
 
 namespace CU {
@@ -30,8 +47,12 @@ namespace CU {
         CheckBlockTimer& operator=(const CheckBlockTimer&) = delete;
         CheckBlockTimer& operator=(CheckBlockTimer&&)      = delete;
 
-        CheckBlockTimer(const std::string& _file, int _line, const std::string& _function) :
-            m_identifier(_file + " : " + std::to_string(_line) + " - " + _function),
+        CheckBlockTimer(
+            const std::string& _prefix,
+            const std::string& _file,
+            int _line,
+            const std::string& _function) :
+            m_identifier(_prefix + _file + ", " + std::to_string(_line) + " - " + _function),
             m_start_time(clock::now()) {}
 
         ~CheckBlockTimer() { Stop(); }
@@ -59,5 +80,6 @@ namespace CU {
 
 #else
 #define USE_CU_PROFILE
-#define CU_PROFILE_CHECKBLOCK
+#define CU_PROFILE_CHECKBLOCK(...)
+#define CU_STOP_CHECKBLOCK(NAME)
 #endif
