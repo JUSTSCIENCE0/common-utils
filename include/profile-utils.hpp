@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <unordered_map>
 
 // TODO: doc profiler interface
 // USE_CU_PROFILE
@@ -20,7 +21,7 @@
 // CU_STOP_CHECKBLOCK(NAME)
 //
 
-#define USE_CU_PROFILE               do { std::cout << "USE_CU_PROFILE" << std::endl; } while(0)
+#define USE_CU_PROFILE               CU::ProfilerAggregator::Setup()
 #define CU_PROFILE_CHECKBLOCK(...)   CU_CHECKBLOCK_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 #define CU_STOP_CHECKBLOCK(NAME)     NAME ##_timer.Stop()
 
@@ -32,9 +33,9 @@
 #define CU_CHECKBLOCK_MACRO_CHOOSER(...) CU_CHOOSE_FROM_ARG_COUNT(CU_NO_ARG_EXPANDER __VA_ARGS__ ())
 
 #define CU_PROFILE_CHECKBLOCK_ANONYMOUS() CU::CheckBlockTimer CU_TIMER_NAME( "", \
-                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__);
+                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__)
 #define CU_PROFILE_CHECKBLOCK_NAMED(NAME) CU::CheckBlockTimer NAME ##_timer( std::string(#NAME) + ": ", \
-                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__);
+                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__)
 
 #define CU_CONCAT_(lhs, rhs) lhs ## rhs
 #define CU_CONCAT(lhs, rhs) CU_CONCAT_(lhs, rhs)
@@ -42,6 +43,40 @@
 
 // implementation
 namespace CU {
+    class ProfilerAggregator {
+    public:
+        static void Setup(
+            // TODO: configuration
+        ) {
+            static ProfilerAggregator profiler{};
+        }
+
+        ProfilerAggregator(const ProfilerAggregator&)            = delete;
+        ProfilerAggregator(ProfilerAggregator&&)                 = delete;
+        ProfilerAggregator& operator=(const ProfilerAggregator&) = delete;
+        ProfilerAggregator& operator=(ProfilerAggregator&&)      = delete;
+
+        ~ProfilerAggregator() {
+            // TODO: show everything
+
+            // TODO: remove it
+            std::cout << "Destroyed profiler" << std::endl;
+        }
+
+        static void NotifyTimer(const std::string& timer_id, int64_t duration) {
+            // TODO
+        }
+
+    private:
+        ProfilerAggregator(
+            // TODO: configuration
+        ) {
+            // TODO: remove it
+            std::cout << "Created profiler" << std::endl;
+        }
+
+    };
+
     class CheckBlockTimer {
     public:
         CheckBlockTimer(const CheckBlockTimer&)            = delete;
