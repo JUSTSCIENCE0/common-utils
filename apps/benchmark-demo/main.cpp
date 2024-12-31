@@ -29,7 +29,10 @@ int main(int argc, char* argv[]) {
 
     TestClass object;
     object.some_work();
-    test_profile();
+
+    for (int i = 0; i < 5; i++) {
+        test_profile();
+    }
 
     return 0;
 }

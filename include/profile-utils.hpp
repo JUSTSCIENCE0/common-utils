@@ -14,6 +14,7 @@
 #include <string>
 #include <chrono>
 #include <unordered_map>
+#include <cassert>
 
 // TODO: doc profiler interface
 // USE_CU_PROFILE
@@ -47,6 +48,7 @@ namespace CU {
     public:
         static void Setup(
             // TODO: configuration
+            // TODO: timescale
         ) {
             static ProfilerAggregator profiler{};
         }
@@ -57,24 +59,48 @@ namespace CU {
         ProfilerAggregator& operator=(ProfilerAggregator&&)      = delete;
 
         ~ProfilerAggregator() {
-            // TODO: show everything
+            // TODO: ability to use a logging system depending on the configuration.
+            constexpr std::ostream& out = std::cout;
 
-            // TODO: remove it
-            std::cout << "Destroyed profiler" << std::endl;
+            out << "Profiler results:" << std::endl;
+
+            for (const auto& [timer_id, timer_result] : m_timer_results) {
+                out << timer_id << ":" << std::endl;
+                out << timer_result << std::endl;
+            }
         }
 
-        static void NotifyTimer(const std::string& timer_id, int64_t duration) {
-            // TODO
+        static void NotifyTimer(const std::string& timer_id, int64_t duration_ns) {
+            // TODO: Thread safety
+            m_timer_results[timer_id].StoreDuration(duration_ns);
         }
 
     private:
         ProfilerAggregator(
             // TODO: configuration
-        ) {
-            // TODO: remove it
-            std::cout << "Created profiler" << std::endl;
-        }
+        ) = default;
 
+        struct TimerResult {
+            int64_t m_activations_count = 0;
+            int64_t m_total_duration_ns = 0;
+            int64_t m_min_duration_ns = std::numeric_limits<int64_t>::max();
+            int64_t m_max_duration_ns = -1;
+
+            void StoreDuration(int64_t duration_ns) {
+                assert(duration_ns >= 0);
+
+                m_activations_count++;
+                m_total_duration_ns += duration_ns;
+                if (m_min_duration_ns > duration_ns)
+                    m_min_duration_ns = duration_ns;
+                if (m_max_duration_ns < duration_ns)
+                    m_max_duration_ns = duration_ns;
+            }
+        };
+
+        static std::unordered_map<std::string, TimerResult> m_timer_results;
+
+        friend std::ostream& operator<<(std::ostream& os, const ProfilerAggregator::TimerResult& tr);
     };
 
     class CheckBlockTimer {
@@ -97,11 +123,10 @@ namespace CU {
         void Stop() {
             if (m_is_stopped) return;
 
-            auto elapsed_time = std::chrono::duration_cast<nano>(clock::now() - m_start_time).count();
+            auto elapsed_time_ns = std::chrono::duration_cast<nano>(clock::now() - m_start_time).count();
             m_is_stopped = true;
 
-            // TODO: store elapsed time to global object
-            std::cout << m_identifier << " - elapsed time = " << elapsed_time << std::endl;
+            ProfilerAggregator::NotifyTimer(m_identifier, elapsed_time_ns);
         }
 
     private:

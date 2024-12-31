@@ -53,6 +53,7 @@ set(IMPLEMENTATION
     include/code-generators/instructions-sets.h
     include/code-generators/cli-parsers.h
     src/log-utils.cpp
+    src/profile-utils.cpp
 )
 
 add_subdirectory(externals/googletest)
