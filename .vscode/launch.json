@@ -5,9 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "benchmark-demo",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "CMake: build",
+            "program": "${workspaceFolder}/build/apps/benchmark-demo/benchmark-demo",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "cli-test",
             "type": "cppdbg",
             "request": "launch",
+            "preLaunchTask": "CMake: build",
             "program": "${workspaceFolder}/build/tests/cli-test/cli-test",
             "args": [],
             "stopAtEntry": false,
@@ -32,6 +58,7 @@
             "name": "cpu-descriptor",
             "type": "cppdbg",
             "request": "launch",
+            "preLaunchTask": "CMake: build",
             "program": "${workspaceFolder}/build/apps/cpu-descriptor/cpu-descriptor",
             "args": [],
             "stopAtEntry": false,
