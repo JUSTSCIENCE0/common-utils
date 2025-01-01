@@ -15,6 +15,7 @@
 #include <chrono>
 #include <unordered_map>
 #include <cassert>
+#include <mutex>
 
 // TODO: doc profiler interface
 // USE_CU_PROFILE
@@ -63,6 +64,7 @@ namespace CU {
 
             out << "Profiler results:" << std::endl;
 
+            std::scoped_lock _(m_timer_results_lock);
             for (const auto& [timer_id, timer_result] : m_timer_results) {
                 out << timer_id << ":" << std::endl;
                 out << timer_result << std::endl;
@@ -70,7 +72,7 @@ namespace CU {
         }
 
         static void NotifyTimer(const std::string& timer_id, int64_t duration_ns) {
-            // TODO: Thread safety
+            std::scoped_lock _(m_timer_results_lock);
             m_timer_results[timer_id].StoreDuration(duration_ns);
         }
 
@@ -97,6 +99,7 @@ namespace CU {
             }
         };
 
+        static std::mutex m_timer_results_lock;
         static std::unordered_map<std::string, TimerResult> m_timer_results;
 
         friend std::ostream& operator<<(std::ostream& os, const ProfilerAggregator::TimerResult& tr);

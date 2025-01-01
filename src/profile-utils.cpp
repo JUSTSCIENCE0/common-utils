@@ -7,6 +7,7 @@
 
 #if ENABLE_CU_PROFILE
 namespace CU {
+    std::mutex ProfilerAggregator::m_timer_results_lock;
     std::unordered_map<std::string, ProfilerAggregator::TimerResult> ProfilerAggregator::m_timer_results;
 
     std::string scale_time_duration_ns(int64_t nanosec) {
