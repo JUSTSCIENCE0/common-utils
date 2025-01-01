@@ -21,7 +21,9 @@
 #include <intrin.h>
 #endif // MSVC
 
-#if  defined(__GNUC__) || defined(__GNUG__)
+#if  defined(__GNUC__) || \
+     defined(__GNUG__) || \
+     defined(__clang__)
 #include <cpuid.h>
 
 #undef __cpuid
@@ -29,7 +31,17 @@ static inline void __cpuid(int cpuInfo[4], int function_id) {
     uint* _cpu_info = reinterpret_cast<uint*>(cpuInfo);
     __get_cpuid(function_id, &_cpu_info[0], &_cpu_info[1], &_cpu_info[2], &_cpu_info[3]);
 }
-#endif // GCC
+
+#if   defined(__clang__)
+static inline void __cpuidex(   int cpuInfo[4], int function_id, int subfunction_id) {
+    __cpuid_count(function_id, subfunction_id, 
+                  reinterpret_cast<unsigned int&>(cpuInfo[0]),
+                  reinterpret_cast<unsigned int&>(cpuInfo[1]),
+                  reinterpret_cast<unsigned int&>(cpuInfo[2]),
+                  reinterpret_cast<unsigned int&>(cpuInfo[3]));
+}
+#endif // Clang
+#endif // GCC & Clang
 
 #endif // CU_ARCH_X86_64
 
@@ -120,7 +132,8 @@ namespace CU {
 #ifdef  CU_ARCH_X86_64
 #if defined(_MSC_VER) || \
     defined(__GNUC__) || \
-    defined(__GNUG__) // TODO: Clang
+    defined(__GNUG__) || \
+    defined(__clang__)
 
 // see https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex
 

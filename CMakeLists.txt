@@ -29,14 +29,14 @@ elseif ((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES 
     add_compile_options(
         # warnings options
         -Wall -Wextra -Wpedantic -Wcast-align -Wcast-qual
-        -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op
-        -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual
-        -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel
+        -Wdisabled-optimization -Wformat=2 -Winit-self 
+        -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual
+        -Wredundant-decls -Wshadow -Wsign-promo 
         -Wstrict-overflow=5 -Wundef -Wno-unused -Wno-variadic-macros
-        -Wno-parentheses -fdiagnostics-show-option
+        -Wno-parentheses -Wno-unused-parameter -fdiagnostics-show-option
         -Werror
     )
-endif()
+endif() # GCC & Clang
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
