@@ -9,22 +9,35 @@
 namespace CU {
     std::unordered_map<std::string, ProfilerAggregator::TimerResult> ProfilerAggregator::m_timer_results;
 
+    std::string scale_time_duration_ns(int64_t nanosec) {
+        assert(nanosec >= 0);
+
+        if (nanosec < 1000) {
+            return std::to_string(nanosec) + " ns.";
+        }
+
+        if (nanosec < 1000000) {
+            constexpr double TIMESCALE = 1e-3;
+            return std::to_string(double(nanosec) * TIMESCALE) + " us.";
+        }
+
+        if (nanosec < 1000000000) {
+            constexpr double TIMESCALE = 1e-6;
+            return std::to_string(double(nanosec) * TIMESCALE) + " ms.";
+        }
+
+        constexpr double TIMESCALE = 1e-9;
+        return std::to_string(double(nanosec) * TIMESCALE) + " s.";
+    }
+
     std::ostream& operator<<(std::ostream& os, const ProfilerAggregator::TimerResult& tr) {
-        // TODO: configurable timescale
-        // now timescale - milliseconds
-        constexpr double TIMESCALE = 1e-6;
-        constexpr std::string TIMESCALE_NAME = "ms.";
+        auto average_time = int64_t(double(tr.m_total_duration_ns) / double(tr.m_activations_count));
 
-        double scaledTotalTime = double(tr.m_total_duration_ns) * TIMESCALE;
-        double scaledAverageTime = scaledTotalTime / double(tr.m_activations_count);
-        double scaledMinTime = double(tr.m_min_duration_ns) * TIMESCALE;
-        double scaledMaxTime = double(tr.m_max_duration_ns) * TIMESCALE;
-
-        os << "\tminimum duration = " << scaledMinTime << " " << TIMESCALE_NAME << std::endl;
-        os << "\tmaximum duration = " << scaledMaxTime << " " << TIMESCALE_NAME << std::endl;
-        os << "\taverage duration = " << scaledAverageTime << " " << TIMESCALE_NAME << std::endl;
+        os << "\tminimum duration = " << scale_time_duration_ns(tr.m_min_duration_ns) << std::endl;
+        os << "\tmaximum duration = " << scale_time_duration_ns(tr.m_max_duration_ns) << std::endl;
+        os << "\taverage duration = " << scale_time_duration_ns(average_time) << std::endl;
         os << "\tactivations count = " << tr.m_activations_count << std::endl;
-        os << "\ttotal = " << scaledTotalTime << TIMESCALE_NAME << std::endl;
+        os << "\ttotal = " << scale_time_duration_ns(tr.m_total_duration_ns) << std::endl;
 
         return os;
     }

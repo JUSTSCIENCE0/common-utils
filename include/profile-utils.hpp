@@ -48,7 +48,6 @@ namespace CU {
     public:
         static void Setup(
             // TODO: configuration
-            // TODO: timescale
         ) {
             static ProfilerAggregator profiler{};
         }
