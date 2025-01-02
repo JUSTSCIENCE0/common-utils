@@ -44,9 +44,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(INTERFACE_HEADERS
+    include/parsing-utils.hpp
+    include/validation-utils.hpp
     include/cpu-utils.hpp
     include/cli-utils.hpp
     include/profile-utils.hpp
+    include/ini-utils.hpp
 )
 
 set(IMPLEMENTATION
@@ -57,6 +60,7 @@ set(IMPLEMENTATION
 )
 
 add_subdirectory(externals/googletest)
+add_subdirectory(externals/mINI)
 set_property(TARGET gmock gmock_main gtest gtest_main PROPERTY FOLDER "externals")
 
 add_library(common-utils STATIC)
