@@ -3,7 +3,8 @@
 //
 // License: MIT
 
-#pragma once
+#include "ini-utils.hpp"
 
-#include "parsing-utils.hpp"
-#include "validation-utils.hpp"
+int main(int argc, char* argv[]) {
+    return 0;
+}
