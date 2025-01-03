@@ -50,6 +50,7 @@ set(INTERFACE_HEADERS
     include/cli-utils.hpp
     include/profile-utils.hpp
     include/ini-utils.hpp
+    include/os-utils.hpp
 )
 
 set(IMPLEMENTATION

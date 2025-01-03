@@ -7,3 +7,14 @@
 
 #include "parsing-utils.hpp"
 #include "validation-utils.hpp"
+#include "os-utils.hpp"
+
+namespace CU {
+    // TODO: doc
+    // CU_INI_SECTION
+
+#ifndef CU_INI_SECTION
+
+#endif // !CU_INI_SECTION
+
+}
