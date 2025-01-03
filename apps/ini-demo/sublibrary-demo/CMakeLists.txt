@@ -5,3 +5,19 @@
 
 cmake_minimum_required(VERSION 3.22)
 
+project(sublibrary-demo)
+
+add_library(sublibrary-demo SHARED)
+target_sources(sublibrary-demo
+    PUBLIC
+        sublibrary-demo.h
+    PRIVATE
+        sublibrary-demo.cpp
+)
+
+target_link_libraries(sublibrary-demo
+    PRIVATE
+        common-utils
+)
+
+set_property(TARGET sublibrary-demo PROPERTY FOLDER "apps/libs")

@@ -18,6 +18,7 @@ add_executable(ini-demo
 target_link_libraries(ini-demo
     PRIVATE
         common-utils
+        sublibrary-demo
 )
 
 set_property(TARGET ini-demo PROPERTY FOLDER "apps")
@@ -28,4 +29,8 @@ add_custom_command(
             ${CONFIG_INI}
             $<TARGET_FILE_DIR:ini-demo>
     COMMENT "Copying config.ini to build directory"
+)
+
+set_target_properties(sublibrary-demo PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:ini-demo>
 )
