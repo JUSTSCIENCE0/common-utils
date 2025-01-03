@@ -7,6 +7,7 @@
 
 #include <string>
 #include <filesystem>
+#include <iostream>
 
 #if defined(_WIN32)
 #include <windows.h>
