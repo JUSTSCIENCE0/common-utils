@@ -60,9 +60,13 @@ set(IMPLEMENTATION
     src/profile-utils.cpp
 )
 
-add_subdirectory(externals/googletest)
-add_subdirectory(externals/mINI)
-set_property(TARGET gmock gmock_main gtest gtest_main PROPERTY FOLDER "externals")
+include(FetchContent)
+FetchContent_Declare(
+    mINI
+    GIT_REPOSITORY https://github.com/metayeti/mINI.git
+    GIT_TAG        52b66e987cb56171dc91d96115cdf094b6e4d7a0 # 0.9.18
+)
+FetchContent_MakeAvailable(mINI)
 
 add_library(common-utils STATIC)
 target_sources(common-utils
