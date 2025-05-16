@@ -3,7 +3,7 @@
 //
 // License: MIT
 
-#include "profile-utils.hpp"
+#include <cu/profile-utils.hpp>
 
 #if ENABLE_CU_PROFILE
 namespace CU {

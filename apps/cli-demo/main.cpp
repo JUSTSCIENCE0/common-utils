@@ -17,7 +17,7 @@
     "Email: yakovmen62@gmail.com\n" \
     "License: MIT"
 
-#include "cli-utils.hpp"
+#include <cu/cli-utils.hpp>
 
 int main(int argc, char* argv[]) {
     CU::CLIConfig cli_config{};

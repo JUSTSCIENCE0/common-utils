@@ -11,7 +11,8 @@
         float, 0.0f, RangeValidator, -1.0f, 1.0f ) \
     CLI_REQUIRED_PROPERTY(required-prop, SYMBOL(r), required_prop, "test required property", \
         std::string, ListValidator, "123", "abc", "qwe" )
-#include "cli-utils.hpp"
+
+#include <cu/cli-utils.hpp>
 
 #include <gtest/gtest.h>
 #include <vector>

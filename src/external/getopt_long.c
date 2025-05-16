@@ -51,7 +51,7 @@
  */
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "external/getopt.h"
+#include <cu/external/getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -44,18 +44,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(INTERFACE_HEADERS
-    include/parsing-utils.hpp
-    include/validation-utils.hpp
-    include/cpu-utils.hpp
-    include/cli-utils.hpp
-    include/profile-utils.hpp
-    include/ini-utils.hpp
-    include/os-utils.hpp
+    include/cu/parsing-utils.hpp
+    include/cu/validation-utils.hpp
+    include/cu/cpu-utils.hpp
+    include/cu/cli-utils.hpp
+    include/cu/profile-utils.hpp
+    include/cu/ini-utils.hpp
+    include/cu/os-utils.hpp
 )
 
 set(IMPLEMENTATION
-    include/code-generators/instructions-sets.h
-    include/code-generators/cli-parsers.h
+    include/cu/code-generators/instructions-sets.h
+    include/cu/code-generators/cli-parsers.h
     src/log-utils.cpp
     src/profile-utils.cpp
 )
@@ -78,7 +78,7 @@ target_sources(common-utils
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(EXTERNAL
-        include/external/getopt.h
+        include/cu/external/getopt.h
         src/external/getopt_long.c
     )
 

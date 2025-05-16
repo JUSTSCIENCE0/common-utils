@@ -11,8 +11,8 @@
     "Email: yakovmen62@gmail.com\n" \
     "License: MIT"
 
-#include <cli-utils.hpp>
-#include <cpu-utils.hpp>
+#include <cu/cli-utils.hpp>
+#include <cu/cpu-utils.hpp>
 
 #include <iostream>
 #include <bitset>

@@ -1,13 +1,13 @@
-// Copyright (c) 2024, Yakov Usoltsev
+// Copyright (c) 2024-2025, Yakov Usoltsev
 // Email: yakovmen62@gmail.com
 //
 // License: MIT
 
 #pragma once
 
-#include "parsing-utils.hpp"
-#include "validation-utils.hpp"
-#include "os-utils.hpp"
+#include <cu/parsing-utils.hpp>
+#include <cu/validation-utils.hpp>
+#include <cu/os-utils.hpp>
 
 namespace CU {
     // TODO: doc

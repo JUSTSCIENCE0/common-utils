@@ -1,15 +1,15 @@
-// Copyright (c) 2024, Yakov Usoltsev
+// Copyright (c) 2024-2025, Yakov Usoltsev
 // Email: yakovmen62@gmail.com
 //
 // License: MIT
 
 #pragma once
 
-#include "parsing-utils.hpp"
-#include "validation-utils.hpp"
+#include <cu/parsing-utils.hpp>
+#include <cu/validation-utils.hpp>
 
 #if defined(_MSC_VER)
-#include "external/getopt.h"
+#include <cu/external/getopt.h>
 #else
 #include <getopt.h>
 #endif // MSVC
@@ -76,7 +76,7 @@ namespace CU {
 #endif // !CLI_CONFIGURATION
 
 // preprocessor magic works here
-#include "code-generators/cli-parsers.h"
+#include <cu/code-generators/cli-parsers.h>
 
 // for the given CLI_CONFIGURATION the following objects are generated:
 //  1) struct CLIConfig {

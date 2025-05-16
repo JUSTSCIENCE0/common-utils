@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Yakov Usoltsev
+// Copyright (c) 2024-2025, Yakov Usoltsev
 // Email: yakovmen62@gmail.com
 //
 // License: MIT
@@ -176,7 +176,7 @@ namespace CU {
 #endif // !CUSTOM_CPU_CONFIGURATION_READER
 
 // preprocessor magic works here
-#include "code-generators/instructions-sets.h"
+#include <cu/code-generators/instructions-sets.h>
 
 // for the given INSTRUCTIONS_SETS the following objects are generated:
 //  1) enum E_INSTRUCTIONS_FAMILY {

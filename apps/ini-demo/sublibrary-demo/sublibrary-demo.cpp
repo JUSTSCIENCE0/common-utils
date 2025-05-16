@@ -5,7 +5,7 @@
 
 #include "sublibrary-demo.h"
 
-#include <os-utils.hpp>
+#include <cu/os-utils.hpp>
 
 void sublibrary_demo_print_library_name() {
     std::cout << CU::get_current_module_filename() << std::endl;
