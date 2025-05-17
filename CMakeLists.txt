@@ -1,4 +1,4 @@
-# Copyright (c) 2024, Yakov Usoltsev
+# Copyright (c) 2024-2025, Yakov Usoltsev
 # Email: yakovmen62@gmail.com
 #
 # License: MIT
@@ -44,13 +44,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(INTERFACE_HEADERS
-    include/cu/parsing-utils.hpp
-    include/cu/validation-utils.hpp
-    include/cu/cpu-utils.hpp
-    include/cu/cli-utils.hpp
-    include/cu/profile-utils.hpp
-    include/cu/ini-utils.hpp
-    include/cu/os-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/parsing-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/validation-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/cpu-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/cli-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/ini-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/os-utils.hpp
 )
 
 set(IMPLEMENTATION
@@ -110,6 +110,31 @@ endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}" SOURCE_DIR_LENGTH)
 target_compile_definitions(common-utils PUBLIC CU_PREFIX_LENGTH=${SOURCE_DIR_LENGTH})
+
+# Embellishments
+set_property(TARGET common-utils PROPERTY INCLUDE_DIR_POSTFIX "cu")
+function(target_interface_group target_name)
+    if (NOT target_name)
+        message(FATAL_ERROR "You must provide a target name")
+    endif()
+
+    get_target_property(TARGET_INTERFACE_HEADERS ${target_name} INTERFACE_SOURCES)
+    get_target_property(TARGET_INTERFACE_INCLUDE_DIR ${target_name} INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(TARGET_INCLUDE_DIR_POSTFIX ${target_name} INCLUDE_DIR_POSTFIX)
+
+    if (TARGET_INTERFACE_HEADERS AND TARGET_INTERFACE_INCLUDE_DIR)
+        if (TARGET_INCLUDE_DIR_POSTFIX)
+            source_group(
+                TREE ${TARGET_INTERFACE_INCLUDE_DIR}/${TARGET_INCLUDE_DIR_POSTFIX}
+                PREFIX ${target_name}
+                FILES ${TARGET_INTERFACE_HEADERS})
+        else(TARGET_INCLUDE_DIR_POSTFIX)
+            source_group(
+                TREE ${TARGET_INTERFACE_INCLUDE_DIR}
+                FILES ${TARGET_INTERFACE_HEADERS})
+        endif(TARGET_INCLUDE_DIR_POSTFIX)
+    endif()
+endfunction()
 
 if (BUILD_CU_APPS)
     add_subdirectory(apps)

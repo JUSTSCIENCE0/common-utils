@@ -1,9 +1,9 @@
-// Copyright (c) 2024, Yakov Usoltsev
+// Copyright (c) 2024-2025, Yakov Usoltsev
 // Email: yakovmen62@gmail.com
 //
 // License: MIT
 
-#include <profile-utils.hpp>
+#include <cu/profile-utils.hpp>
 
 #include "some_class.h"
 

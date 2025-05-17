@@ -1,4 +1,4 @@
-# Copyright (c) 2024, Yakov Usoltsev
+# Copyright (c) 2024-2025, Yakov Usoltsev
 # Email: yakovmen62@gmail.com
 #
 # License: MIT
@@ -22,6 +22,7 @@ target_link_libraries(ini-demo
 )
 
 set_property(TARGET ini-demo PROPERTY FOLDER "apps")
+target_interface_group(common-utils)
 
 add_custom_command(
     TARGET ini-demo POST_BUILD

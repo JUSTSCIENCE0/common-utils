@@ -1,4 +1,4 @@
-# Copyright (c) 2024, Yakov Usoltsev
+# Copyright (c) 2024-2025, Yakov Usoltsev
 # Email: yakovmen62@gmail.com
 #
 # License: MIT
@@ -17,3 +17,4 @@ target_link_libraries(cli-demo
 )
 
 set_property(TARGET cli-demo PROPERTY FOLDER "apps")
+target_interface_group(common-utils)
