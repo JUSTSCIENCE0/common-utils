@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #if defined(_WIN32)
 #include <windows.h>
