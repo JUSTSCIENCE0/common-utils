@@ -50,7 +50,7 @@ set(INTERFACE_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/cli-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/ini-utils.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/cu/os-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/file-utils.hpp
 )
 
 set(IMPLEMENTATION
