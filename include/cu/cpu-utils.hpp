@@ -46,6 +46,8 @@ static inline void __cpuidex(   int cpuInfo[4], int function_id, int subfunction
 #endif // CU_ARCH_X86_64
 
 namespace CU {
+    static constexpr auto DEFAULT_INSET = std::numeric_limits<int>::max();
+
     typedef int InstructionsFamily;
     typedef int InstructionsSet;
     typedef int SupportInfam;
