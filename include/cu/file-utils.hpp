@@ -64,6 +64,7 @@ namespace CU {
         }
 
         auto file_size = file_reader.tellg();
+        file_reader.seekg(std::ios::beg);
         if (file_size % sizeof(Unit)) {
             // TODO: use log system, instead of stdout
             std::cout << "file size " << file_size <<
@@ -71,7 +72,7 @@ namespace CU {
         }
 
         auto units_count = file_size / sizeof(Unit);
-        std::vector<Unit> result{ units_count };
+        std::vector<Unit> result(units_count);
 
         if (!file_reader.read(reinterpret_cast<char*>(result.data()), units_count * sizeof(Unit))) {
             // TODO: use log system, instead of stdout
