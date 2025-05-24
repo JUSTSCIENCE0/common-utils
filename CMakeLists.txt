@@ -51,6 +51,8 @@ set(INTERFACE_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/ini-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/file-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/simd-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/macro-utils.hpp
 )
 
 set(IMPLEMENTATION
