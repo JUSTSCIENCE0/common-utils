@@ -51,9 +51,9 @@ function(generate_simd_compile_units
     set(GENERATED_FILE ${CMAKE_CURRENT_LIST_DIR}/generated/${IMPLEMENTATION_NAME}.hpp)
     configure_file(${INTERFACE_TEMPLATE} ${GENERATED_FILE} @ONLY)
     set(GENERATED_FILES ${GENERATED_FILES} ${GENERATED_FILE})
-    message("GENERATED_FILES = ${GENERATED_FILES}")
 
-    # TODO:
-    # source_group
     # add to target
+    target_sources(${target} PRIVATE ${GENERATED_FILES})
+    target_include_directories(${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/generated)
+    source_group("Generated" FILES ${GENERATED_FILES})
 endfunction()
