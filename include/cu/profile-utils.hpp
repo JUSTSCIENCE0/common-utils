@@ -5,11 +5,7 @@
 
 #pragma once
 
-#ifndef ENABLE_CU_PROFILE
-#define ENABLE_CU_PROFILE 0
-#endif // !ENABLE_CU_PROFILE
-
-#if ENABLE_CU_PROFILE
+#if defined(ENABLE_CU_PROFILE)
 #include <iostream>
 #include <string>
 #include <chrono>
