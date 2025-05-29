@@ -15,7 +15,9 @@ endif()
 
 option(BUILD_CU_APPS        "Build example applications" ON)
 option(BUILD_CU_TEST        "Build tests" ON)
+
 option(ENABLE_CU_PROFILE    "Enable profile utils" OFF)
+option(ENABLE_CU_TEST_UTILS "Enable test utils"    OFF)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options(
@@ -48,12 +50,23 @@ set(INTERFACE_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/validation-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/cpu-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/cli-utils.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/ini-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/file-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/simd-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/macro-utils.hpp
 )
+
+if (ENABLE_CU_PROFILE)
+    set(INTERFACE_HEADERS
+        ${INTERFACE_HEADERS}
+        ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp)
+endif(ENABLE_CU_PROFILE)
+
+if (ENABLE_CU_TEST_UTILS)
+    set(INTERFACE_HEADERS
+        ${INTERFACE_HEADERS}
+        ${CMAKE_CURRENT_LIST_DIR}/include/cu/test-utils.hpp)
+endif(ENABLE_CU_TEST_UTILS)
 
 set(IMPLEMENTATION
     include/cu/code-generators/instructions-sets.h
@@ -69,6 +82,19 @@ FetchContent_Declare(
     GIT_TAG        52b66e987cb56171dc91d96115cdf094b6e4d7a0 # 0.9.18
 )
 FetchContent_MakeAvailable(mINI)
+
+# googletest
+if (ENABLE_CU_TEST_UTILS OR BUILD_CU_TEST)
+    if (NOT TARGET gtest)
+        FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG        52eb8108c5bdec04579160ae17225d66034bd723 # v1.17.0
+        )
+        FetchContent_MakeAvailable(googletest)
+        set_property(TARGET gmock gmock_main gtest gtest_main PROPERTY FOLDER "externals")
+    endif()
+endif()
 
 add_library(common-utils STATIC)
 target_sources(common-utils
@@ -149,3 +175,11 @@ endif(BUILD_CU_TEST)
 if (ENABLE_CU_PROFILE)
     target_compile_definitions(common-utils PUBLIC ENABLE_CU_PROFILE=1)
 endif(ENABLE_CU_PROFILE)
+
+if (ENABLE_CU_TEST_UTILS)
+    target_compile_definitions(common-utils PUBLIC ENABLE_CU_TEST_UTILS=1)
+    target_link_libraries(common-utils
+        PUBLIC
+            GTest::gtest
+    )
+endif(ENABLE_CU_TEST_UTILS)
