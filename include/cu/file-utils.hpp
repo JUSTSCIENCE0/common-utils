@@ -49,7 +49,7 @@ namespace CU {
 
     template<typename Unit>
     requires std::is_fundamental_v<Unit>
-    std::vector<Unit> load_data_from_file(const std::string& file_name) {
+    std::vector<Unit> load_data_from_file(const std::filesystem::path& file_name) {
         if (!std::filesystem::exists(file_name)) {
             // TODO: use log system, instead of stdout
             std::cout << "selected file " << file_name << " doesn't exist" << std::endl;
