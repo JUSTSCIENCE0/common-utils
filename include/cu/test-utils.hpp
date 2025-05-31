@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025, Yakov Usoltsev
+// Copyright (c) 2025, Yakov Usoltsev
 // Email: yakovmen62@gmail.com
 //
 // License: MIT
@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <cu/file-utils.hpp>
+#include <cu/macro-utils.hpp>
 
 #include <vector>
 #include <functional>
@@ -50,15 +51,15 @@ namespace CU {
     template <typename Unit, typename... AdditionalArgs>
         requires std::is_fundamental_v<Unit>
     void run_conformance_test(
-        const std::string& test_data_path,
-        const std::string& control_data_path,
+        const std::filesystem::path& test_data_path,
+        const std::filesystem::path& control_data_path,
         ConformanceTestFunctionsList<Unit, AdditionalArgs...> test_functions,
         AdditionalArgs... additional_args) {
         auto input_data = CU::load_data_from_file<Unit>(test_data_path);
-        ASSERT_FALSE(input_data.empty());
+        ASSERT_FALSE(input_data.empty()) << "Failed to load test data";
 
         auto output_data = CU::load_data_from_file<Unit>(control_data_path);
-        ASSERT_FALSE(output_data.empty());
+        ASSERT_FALSE(output_data.empty()) << "Failed to load control data";
 
         std::vector<Unit> result_data(output_data.size());
 
@@ -66,10 +67,30 @@ namespace CU {
             func(input_data.data(), input_data.size(), result_data.data(), std::forward(additional_args)...);
 
             for (unsigned i = 0; i < output_data.size(); i++) {
-                ASSERT_EQ(output_data[i], result_data[i]);
+                ASSERT_EQ(output_data[i], result_data[i]) << "Failed control check";
             }
         }
     }
 }
+
+#define CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, /*test_functions*/...) \
+    TEST(Conformance, name) { \
+        std::filesystem::path test_path{ test_data_path }; \
+        test_path.append(test_file); \
+        std::filesystem::path control_path{test_data_path}; \
+        control_path.append(control_file); \
+        auto test_list = CU::make_conformance_list( { __VA_ARGS__ } ); \
+        CU::run_conformance_test(test_path, control_path, test_list); \
+    }
+
+#define CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, /*simd sets*/...) \
+    TEST(Conformance, name) { \
+        std::filesystem::path test_path{ test_data_path }; \
+        test_path.append(test_file); \
+        std::filesystem::path control_path{test_data_path}; \
+        control_path.append(control_file); \
+        auto test_list = CU::make_conformance_list( { CU_CONCAT_FOR_EACH(function, __VA_ARGS__) } ); \
+        CU::run_conformance_test(test_path, control_path, test_list); \
+    }
 
 #endif
