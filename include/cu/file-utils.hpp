@@ -10,12 +10,14 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cstring>
 
 #if defined(_WIN32)
 #include <windows.h>
 #endif
 
 #if defined(__linux__)
+#include <dlfcn.h>
 #include <unistd.h>
 #include <linux/limits.h>
 #endif
@@ -24,8 +26,8 @@ namespace CU {
     static inline std::string get_current_module_filename() {
         namespace fs = std::filesystem;
 
+        constexpr int max_path = 1024;
 #if  defined(_WIN32)
-        constexpr DWORD max_path = 1024;
         wchar_t buf[max_path] = L"";
 
         HMODULE hModule = nullptr;
@@ -39,12 +41,24 @@ namespace CU {
             hModule = nullptr;
         }
         GetModuleFileName(hModule, buf, max_path);
+#elif defined(__linux__)
+        char buf[max_path] = "";
+
+        Dl_info info{};
+        if (dladdr(reinterpret_cast<void*>(&get_current_module_filename), &info) && info.dli_fname) {
+            std::strncpy(buf, info.dli_fname, max_path);
+        }
+        else {
+            // fallback: /proc/self/exe
+            // return file name for executable
+            readlink("/proc/self/exe", buf, max_path);
+        }
+#else
+        static_assert(!"Unsupported OS");
+#endif //  _WIN32
 
         fs::path module_path(buf);
         return module_path.stem().string();
-#else
-        static_assert(false, "Unsupported OS");
-#endif //  _WIN32
     }
 
     template<typename Unit>
