@@ -3,6 +3,32 @@
 #
 # License: MIT
 
+# helpers
+
+function(set_simd_compile_unit_flag
+    file_path
+    instructions_set
+)
+    if (instructions_set STREQUAL "DEF")
+        return()
+    endif()
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+        set(ARCH_FLAG "/arch:${instructions_set}")
+    elseif ((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+        string(TOLOWER ${instructions_set} instructions_set_lower)
+        string(REPLACE "_" "." instructions_set_name "${instructions_set_lower}")
+        set(ARCH_FLAG "-m${instructions_set_name}")
+    endif() # GCC & Clang
+
+    set_source_files_properties(${file_path}
+        PROPERTIES
+            COMPILE_OPTIONS ${ARCH_FLAG}
+    )
+endfunction()
+
+# interface
+
 # For the given implementation of a function or class,
 # generates an interface header file (.hpp) and a compilation unit file (.cpp)
 # for each supported instruction set.
@@ -45,6 +71,8 @@ function(generate_simd_compile_units
         set(GENERATED_FILE ${CMAKE_CURRENT_LIST_DIR}/generated/${IMPLEMENTATION_NAME}_${supported_set_lower}.cpp)
         configure_file(${COMPILE_UNIT_TEMPLATE} ${GENERATED_FILE} @ONLY)
         set(GENERATED_FILES ${GENERATED_FILES} ${GENERATED_FILE})
+
+        set_simd_compile_unit_flag(${GENERATED_FILE} ${supported_set})
     endforeach()
 
     # generate interface header
