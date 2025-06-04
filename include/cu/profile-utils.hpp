@@ -6,6 +6,8 @@
 #pragma once
 
 #if defined(ENABLE_CU_PROFILE)
+#include <cu/macro-utils.hpp>
+
 #include <iostream>
 #include <string>
 #include <chrono>
@@ -13,34 +15,62 @@
 #include <cassert>
 #include <mutex>
 
-// TODO: doc profiler interface
-// USE_CU_PROFILE
-// CU_PROFILE_CHECKBLOCK(NAME), NAME - optional
-// CU_STOP_CHECKBLOCK(NAME)
+// Macro descriptions:
 //
+// USE_CU_PROFILE
+// Macro that enables automatic logging of data collected from all timers when the executable module terminates.
+// This macro must be called at least once within the executable module to activate the logging upon exit.
+// If the macro is not called, timers created with CU_PROFILE_CHECKBLOCK will still function and store
+// their measurement results in memory, but no automatic logging will occur.
+// The measurement results can still be retrieved by calling CU_PROFILE_GET_RESULTS.
+//
+// CU_PROFILE_CHECKBLOCK(NAME) (NAME is optional)
+// Macro that creates a timer measuring the duration from its creation to the end of the current code block
+// (i.e., the end of the current compound statement).
+// If NAME is provided, a named timer is created,
+// which can be manually stopped before the block ends using CU_STOP_CHECKBLOCK.
+// If NAME is omitted, an anonymous timer is created that cannot be stopped early.
+// After stopping, the timer stores the measurement results.
+//
+// CU_STOP_CHECKBLOCK(NAME)
+// Macro that stops the timer with the specified NAME.
+//
+// CU_PROFILE_GET_RESULTS()
+// Macro that returns all available measurement results.
 
 #define USE_CU_PROFILE               CU::ProfilerAggregator::Setup()
 #define CU_PROFILE_CHECKBLOCK(...)   CU_CHECKBLOCK_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 #define CU_STOP_CHECKBLOCK(NAME)     NAME ##_timer.Stop()
+#define CU_PROFILE_GET_RESULTS()     CU::ProfilerAggregator::GetCurrentResults()
 
-// preprocessor magic
-#define CU_FUNC_CHOOSER(_f1, _f2, ...) _f2
-#define CU_FUNC_RECOMPOSER(argsWithParentheses) CU_FUNC_CHOOSER argsWithParentheses
-#define CU_CHOOSE_FROM_ARG_COUNT(...) CU_FUNC_RECOMPOSER((__VA_ARGS__, CU_PROFILE_CHECKBLOCK_NAMED, ))
-#define CU_NO_ARG_EXPANDER() ,CU_PROFILE_CHECKBLOCK_ANONYMOUS
-#define CU_CHECKBLOCK_MACRO_CHOOSER(...) CU_CHOOSE_FROM_ARG_COUNT(CU_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define CU_ANONYMOUS_OPTION() CU::CheckBlockTimer CU_TIMER_NAME{ "", \
+                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__}
+#define CU_PROFILE_NAMED_OPTION(NAME) CU::CheckBlockTimer NAME ##_timer{ std::string(#NAME) + ": ", \
+                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__}
 
-#define CU_PROFILE_CHECKBLOCK_ANONYMOUS() CU::CheckBlockTimer CU_TIMER_NAME( "", \
-                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__)
-#define CU_PROFILE_CHECKBLOCK_NAMED(NAME) CU::CheckBlockTimer NAME ##_timer( std::string(#NAME) + ": ", \
-                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__)
-
-#define CU_CONCAT_(lhs, rhs) lhs ## rhs
-#define CU_CONCAT(lhs, rhs) CU_CONCAT_(lhs, rhs)
-#define CU_TIMER_NAME CU_CONCAT(timer_, __LINE__)
+#define CU_TIMER_NAME CU_EXPAND_CONCAT(timer, __LINE__)
 
 // implementation
 namespace CU {
+    struct TimerResult {
+        int64_t m_activations_count = 0;
+        int64_t m_total_duration_ns = 0;
+        int64_t m_min_duration_ns = std::numeric_limits<int64_t>::max();
+        int64_t m_max_duration_ns = -1;
+
+        void StoreDuration(int64_t duration_ns) {
+            assert(duration_ns >= 0);
+
+            m_activations_count++;
+            m_total_duration_ns += duration_ns;
+            if (m_min_duration_ns > duration_ns)
+                m_min_duration_ns = duration_ns;
+            if (m_max_duration_ns < duration_ns)
+                m_max_duration_ns = duration_ns;
+        }
+    };
+    std::ostream& operator<<(std::ostream& os, const TimerResult& tr);
+
     class ProfilerAggregator {
     public:
         static void Setup(
@@ -72,33 +102,17 @@ namespace CU {
             m_timer_results[timer_id].StoreDuration(duration_ns);
         }
 
+        static auto GetCurrentResults() {
+            return m_timer_results;
+        }
+
     private:
         ProfilerAggregator(
             // TODO: configuration
         ) = default;
 
-        struct TimerResult {
-            int64_t m_activations_count = 0;
-            int64_t m_total_duration_ns = 0;
-            int64_t m_min_duration_ns = std::numeric_limits<int64_t>::max();
-            int64_t m_max_duration_ns = -1;
-
-            void StoreDuration(int64_t duration_ns) {
-                assert(duration_ns >= 0);
-
-                m_activations_count++;
-                m_total_duration_ns += duration_ns;
-                if (m_min_duration_ns > duration_ns)
-                    m_min_duration_ns = duration_ns;
-                if (m_max_duration_ns < duration_ns)
-                    m_max_duration_ns = duration_ns;
-            }
-        };
-
         static std::mutex m_timer_results_lock;
         static std::unordered_map<std::string, TimerResult> m_timer_results;
-
-        friend std::ostream& operator<<(std::ostream& os, const ProfilerAggregator::TimerResult& tr);
     };
 
     class CheckBlockTimer {

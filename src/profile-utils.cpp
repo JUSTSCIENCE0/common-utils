@@ -8,7 +8,7 @@
 #if ENABLE_CU_PROFILE
 namespace CU {
     std::mutex ProfilerAggregator::m_timer_results_lock;
-    std::unordered_map<std::string, ProfilerAggregator::TimerResult> ProfilerAggregator::m_timer_results;
+    std::unordered_map<std::string, TimerResult> ProfilerAggregator::m_timer_results;
 
     std::string scale_time_duration_ns(int64_t nanosec) {
         assert(nanosec >= 0);
@@ -31,7 +31,7 @@ namespace CU {
         return std::to_string(double(nanosec) * TIMESCALE) + " s.";
     }
 
-    std::ostream& operator<<(std::ostream& os, const ProfilerAggregator::TimerResult& tr) {
+    std::ostream& operator<<(std::ostream& os, const TimerResult& tr) {
         auto average_time = int64_t(double(tr.m_total_duration_ns) / double(tr.m_activations_count));
 
         os << "\tminimum duration = " << scale_time_duration_ns(tr.m_min_duration_ns) << std::endl;

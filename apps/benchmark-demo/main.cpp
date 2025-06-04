@@ -34,5 +34,6 @@ int main(int argc, char* argv[]) {
         test_profile();
     }
 
+    auto profile_results = CU_PROFILE_GET_RESULTS();
     return 0;
 }
