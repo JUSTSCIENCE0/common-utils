@@ -156,4 +156,5 @@ namespace CU {
 #define USE_CU_PROFILE
 #define CU_PROFILE_CHECKBLOCK(...)
 #define CU_STOP_CHECKBLOCK(NAME)
+#define CU_PROFILE_GET_RESULTS() {}
 #endif
