@@ -57,13 +57,8 @@ set(INTERFACE_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/file-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/simd-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/macro-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp
 )
-
-if (ENABLE_CU_PROFILE)
-    set(INTERFACE_HEADERS
-        ${INTERFACE_HEADERS}
-        ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp)
-endif(ENABLE_CU_PROFILE)
 
 if (ENABLE_CU_TEST_UTILS)
     set(INTERFACE_HEADERS
