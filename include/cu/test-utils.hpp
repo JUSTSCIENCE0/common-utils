@@ -19,33 +19,33 @@
 namespace CU {
     template <typename Unit, typename... AdditionalArgs>
         requires std::is_fundamental_v<Unit>
-    using ConformanceTestFunction = std::function<void(const Unit*, int64_t, Unit*, AdditionalArgs...)>;
+    using TestFunction = std::function<void(const Unit*, int64_t, Unit*, AdditionalArgs...)>;
 
     template <typename Unit, typename... AdditionalArgs>
-    ConformanceTestFunction<Unit, AdditionalArgs...> make_conformance_test_func(
+    TestFunction<Unit, AdditionalArgs...> make_test_function(
         void(*f)(const Unit*, int64_t, Unit*, AdditionalArgs...)) {
         return f;
     }
 
     template <typename Unit, typename... AdditionalArgs>
-    using ConformanceTestFunctionsList = std::vector<ConformanceTestFunction<Unit, AdditionalArgs...>>;
+    using TestFunctionsList = std::vector<TestFunction<Unit, AdditionalArgs...>>;
 
     template <typename Unit, typename... AdditionalArgs>
-    ConformanceTestFunctionsList<Unit, AdditionalArgs...> make_conformance_list(
+    TestFunctionsList<Unit, AdditionalArgs...> make_test_functions_list(
         std::initializer_list<void(*)(const Unit*, int64_t, Unit*, AdditionalArgs...)> functions
     ) {
-        ConformanceTestFunctionsList<Unit, AdditionalArgs...> result;
+        TestFunctionsList<Unit, AdditionalArgs...> result;
         for (auto func : functions) {
-            result.push_back(make_conformance_test_func(func));
+            result.push_back(make_test_function(func));
         }
         return result;
     }
 
     template <typename Unit, typename... AdditionalArgs>
-    ConformanceTestFunctionsList<Unit, AdditionalArgs...> make_conformance_list(
-        std::initializer_list<ConformanceTestFunction<Unit, AdditionalArgs...>> functions
+    TestFunctionsList<Unit, AdditionalArgs...> make_test_functions_list(
+        std::initializer_list<TestFunction<Unit, AdditionalArgs...>> functions
     ) {
-        return ConformanceTestFunctionsList<Unit, AdditionalArgs...>(functions);
+        return TestFunctionsList<Unit, AdditionalArgs...>(functions);
     }
 
     template <typename Unit, typename... AdditionalArgs>
@@ -53,7 +53,7 @@ namespace CU {
     void run_conformance_test(
         const std::filesystem::path& test_data_path,
         const std::filesystem::path& control_data_path,
-        ConformanceTestFunctionsList<Unit, AdditionalArgs...> test_functions,
+        TestFunctionsList<Unit, AdditionalArgs...> test_functions,
         AdditionalArgs... additional_args) {
         auto input_data = CU::load_data_from_file<Unit>(test_data_path);
         ASSERT_FALSE(input_data.empty()) << "Failed to load test data";
@@ -79,18 +79,10 @@ namespace CU {
         test_path.append(test_file); \
         std::filesystem::path control_path{test_data_path}; \
         control_path.append(control_file); \
-        auto test_list = CU::make_conformance_list( { __VA_ARGS__ } ); \
+        auto test_list = CU::make_test_functions_list( { __VA_ARGS__ } ); \
         CU::run_conformance_test(test_path, control_path, test_list); \
     }
 
 #define CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, /*simd sets*/...) \
-    TEST(Conformance, name) { \
-        std::filesystem::path test_path{ test_data_path }; \
-        test_path.append(test_file); \
-        std::filesystem::path control_path{test_data_path}; \
-        control_path.append(control_file); \
-        auto test_list = CU::make_conformance_list( { CU_CONCAT_FOR_EACH(function, __VA_ARGS__) } ); \
-        CU::run_conformance_test(test_path, control_path, test_list); \
-    }
-
+    CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, CU_CONCAT_FOR_EACH(function, __VA_ARGS__))
 #endif
