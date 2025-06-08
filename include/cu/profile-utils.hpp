@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <cassert>
 #include <mutex>
+#include <ranges>
+#include <algorithm>
 
 // Macro descriptions:
 //
@@ -38,13 +40,15 @@
 // CU_STOP_CHECKBLOCK(NAME)
 // Macro that stops the timer with the specified NAME.
 //
-// CU_PROFILE_GET_RESULTS()
+// CU_PROFILE_GET_RESULTS(FILTER) (FILTER is optional)
 // Macro that returns all available measurement results.
+// If FILTER is provided, only the results matching the keys in FILTER will be returned.
+// FILTER must be a range-iterating container and contain values convertible to std::string
 
 #define USE_CU_PROFILE               CU::ProfilerAggregator::Setup()
 #define CU_PROFILE_CHECKBLOCK(...)   CU_CHOOSE_MACRO_BY_ARGS_COUNT(CU_PROFILE_CHECKBLOCK, __VA_ARGS__)
 #define CU_STOP_CHECKBLOCK(NAME)     NAME ##_timer.Stop()
-#define CU_PROFILE_GET_RESULTS()     CU::ProfilerAggregator::GetCurrentResults()
+#define CU_PROFILE_GET_RESULTS(...)  CU::ProfilerAggregator::GetCurrentResults(__VA_ARGS__)
 
 // Implementation
 #define CU_TIMER_NAME CU_EXPAND_CONCAT(timer, __LINE__)
@@ -73,11 +77,20 @@ namespace CU {
             if (m_max_duration_ns < duration_ns)
                 m_max_duration_ns = duration_ns;
         }
+
+        int64_t GetAvgNS() const {
+            if (!m_activations_count)
+                return 0;
+
+            return m_total_duration_ns / m_activations_count;
+        }
     };
     std::ostream& operator<<(std::ostream& os, const TimerResult& tr);
 
     class ProfilerAggregator {
     public:
+        using TimersResults = std::unordered_map<std::string, TimerResult>;
+
         static void Setup(
             // TODO: configuration
         ) {
@@ -107,8 +120,39 @@ namespace CU {
             m_timer_results[timer_id].StoreDuration(duration_ns);
         }
 
-        static auto GetCurrentResults() {
+        static TimersResults GetCurrentResults() {
+            std::scoped_lock _(m_timer_results_lock);
             return m_timer_results;
+        }
+
+        template<typename StrKeyContainer>
+            requires std::ranges::range<StrKeyContainer> &&
+                     std::is_convertible_v<std::ranges::range_value_t<StrKeyContainer>, std::string>
+        static TimersResults GetCurrentResults(StrKeyContainer&& filter) {
+            auto all_results = GetCurrentResults();
+
+            TimersResults filtered_results;
+
+            for (const std::string& key : filter) {
+                auto has_selected_key = [key](const TimersResults::value_type& node) {
+                    return node.first.compare(0, key.size(), key) == 0;
+                    };
+
+                const auto key_result = std::find_if(
+                    all_results.begin(),
+                    all_results.end(),
+                    has_selected_key);
+
+                if (all_results.end() == key_result) {
+                    // TODO: ability to use a logging system depending on the configuration.
+                    constexpr std::ostream& out = std::cout;
+                    out << "Key <" << key << "> not found in timers results" << std::endl;
+                    continue;
+                }
+
+                filtered_results[key] = key_result->second;
+            }
+            return filtered_results;
         }
 
     private:
@@ -117,7 +161,7 @@ namespace CU {
         ) = default;
 
         static std::mutex m_timer_results_lock;
-        static std::unordered_map<std::string, TimerResult> m_timer_results;
+        static TimersResults m_timer_results;
     };
 
     class CheckBlockTimer {
