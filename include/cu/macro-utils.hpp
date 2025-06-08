@@ -8,6 +8,8 @@
 // preprocessor magic works here
 #include <cu/code-generators/macro-helpers.h>
 
+#define CU_REMOVE_PARENS(...) __VA_ARGS__
+
 #define CU_CONCAT(lhs, rhs) lhs ##_ ##rhs
 #define CU_EXPAND_CONCAT(lhs, rhs) CU_CONCAT(lhs, rhs)
 
@@ -16,6 +18,8 @@
 
 #define CU_STR(x) #x
 #define CU_EXPAND_STR(x) CU_STR(x)
+
+#define CU_STR_COMMA(x) CU_STR(x),
 
 // thanks to David Mazieres
 // see https://www.scs.stanford.edu/~dm/blog/va-opt.html
