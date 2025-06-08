@@ -24,13 +24,16 @@
 // their measurement results in memory, but no automatic logging will occur.
 // The measurement results can still be retrieved by calling CU_PROFILE_GET_RESULTS.
 //
-// CU_PROFILE_CHECKBLOCK(NAME) (NAME is optional)
+// CU_PROFILE_CHECKBLOCK(NAME, KEY) (NAME and KEY are optional)
 // Macro that creates a timer measuring the duration from its creation to the end of the current code block
 // (i.e., the end of the current compound statement).
 // If NAME is provided, a named timer is created,
 // which can be manually stopped before the block ends using CU_STOP_CHECKBLOCK.
 // If NAME is omitted, an anonymous timer is created that cannot be stopped early.
 // After stopping, the timer stores the measurement results.
+// If KEY is provided, the created named timer will use the variable passed in KEY as the key for storing results.
+// This allows a single named timer to save its measurements under different keys,
+// depending on the value of the variable in KEY. KEY must be convertible to std::string.
 //
 // CU_STOP_CHECKBLOCK(NAME)
 // Macro that stops the timer with the specified NAME.
@@ -39,16 +42,18 @@
 // Macro that returns all available measurement results.
 
 #define USE_CU_PROFILE               CU::ProfilerAggregator::Setup()
-#define CU_PROFILE_CHECKBLOCK(...)   CU_CHECKBLOCK_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define CU_PROFILE_CHECKBLOCK(...)   CU_CHOOSE_MACRO_BY_ARGS_COUNT(CU_PROFILE_CHECKBLOCK, __VA_ARGS__)
 #define CU_STOP_CHECKBLOCK(NAME)     NAME ##_timer.Stop()
 #define CU_PROFILE_GET_RESULTS()     CU::ProfilerAggregator::GetCurrentResults()
 
-#define CU_ANONYMOUS_OPTION() CU::CheckBlockTimer CU_TIMER_NAME{ "", \
-                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__}
-#define CU_PROFILE_NAMED_OPTION(NAME) CU::CheckBlockTimer NAME ##_timer{ std::string(#NAME) + ": ", \
-                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__}
-
+// Implementation
 #define CU_TIMER_NAME CU_EXPAND_CONCAT(timer, __LINE__)
+#define CU_PROFILE_CHECKBLOCK_0() CU::CheckBlockTimer CU_TIMER_NAME { "", \
+                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__}
+#define CU_PROFILE_CHECKBLOCK_1(NAME) CU::CheckBlockTimer NAME ##_timer{ std::string(#NAME) + ": ", \
+                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__}
+#define CU_PROFILE_CHECKBLOCK_2(NAME, KEY) CU::CheckBlockTimer NAME ##_timer{ std::string(KEY) + ": ", \
+                                              std::string(__FILE__).erase(0, CU_PREFIX_LENGTH + 1), __LINE__, __FUNCTION__}
 
 // implementation
 namespace CU {
