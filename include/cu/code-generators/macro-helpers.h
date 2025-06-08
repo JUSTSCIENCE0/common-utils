@@ -24,11 +24,8 @@
     __VA_OPT__(CU_CONCAT_FOR_EACH_AGAIN CU_PARENS (value, __VA_ARGS__))
 #define CU_CONCAT_FOR_EACH_AGAIN() CU_CONCAT_FOR_EACH_HELPER
 
-// helpers for selecting an implementation based on whether the macro has arguments.
-// if arguments are present, the CU_PROFILE_NAMED_OPTION implementation will be selected
-// otherwise, CU_ANONYMOUS_OPTION will be used.
-#define CU_FUNC_CHOOSER(_f1, _f2, ...) _f2
-#define CU_FUNC_RECOMPOSER(argsWithParentheses) CU_FUNC_CHOOSER argsWithParentheses
-#define CU_CHOOSE_FROM_ARG_COUNT(...) CU_FUNC_RECOMPOSER((__VA_ARGS__, CU_PROFILE_NAMED_OPTION, ))
-#define CU_NO_ARG_EXPANDER() ,CU_ANONYMOUS_OPTION
-#define CU_CHECKBLOCK_MACRO_CHOOSER(...) CU_CHOOSE_FROM_ARG_COUNT(CU_NO_ARG_EXPANDER __VA_ARGS__ ())
+// helpers for selecting an implementation based on the number of arguments passed to a macro.
+// supports up to 2 arguments
+#define CU_GET_ARG_NO_3(_1, _2, N, ...) N
+#define CU_GET_ARGS_COUNT(...) CU_GET_ARG_NO_3(__VA_ARGS__ __VA_OPT__(,) 2, 1, 0)
+#define CU_GENERATE_MACRO_IMPL_NAME(name, count) CU_EXPAND_CONCAT(name, count)
