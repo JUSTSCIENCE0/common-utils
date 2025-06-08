@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
     object.some_work();
 
     for (int i = 0; i < 5; i++) {
+        CU_PROFILE_CHECKBLOCK(profile_case, std::to_string(i));
         test_profile();
     }
 
