@@ -56,10 +56,10 @@ namespace CU {
     template <typename Unit, typename... AdditionalArgs>
         requires std::is_fundamental_v<Unit>
     void run_conformance_test(
-        const std::filesystem::path& test_data_path,
-        const std::filesystem::path& control_data_path,
-        TestFunctionsList<Unit, AdditionalArgs...> test_functions,
-        AdditionalArgs... additional_args) {
+            const std::filesystem::path& test_data_path,
+            const std::filesystem::path& control_data_path,
+            TestFunctionsList<Unit, AdditionalArgs...> test_functions,
+            AdditionalArgs... additional_args) {
         auto input_data = CU::load_data_from_file<Unit>(test_data_path);
         ASSERT_FALSE(input_data.empty()) << "Failed to load test data";
 
