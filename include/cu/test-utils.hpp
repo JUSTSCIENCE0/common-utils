@@ -141,12 +141,12 @@ namespace CU {
         std::filesystem::path control_path{test_data_path}; \
         control_path.append(control_file); \
         auto test_list = CU::make_test_functions_list( { CU_REMOVE_PARENS test_functions } ); \
-        CU::run_conformance_test(test_path, control_path, test_list, ##__VA_ARGS__); \
+        CU::run_conformance_test(test_path, control_path, test_list __VA_OPT__(,) __VA_ARGS__); \
     }
 
 #define CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, simd_sets, /* additional args*/...) \
     CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, \
-        ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ), ##__VA_ARGS__ )
+        ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ) __VA_OPT__(,) __VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den, \
             repeats_count, strong_less, test_functions, /* additional args*/...) \
@@ -156,7 +156,7 @@ namespace CU {
         auto test_list = CU::make_test_functions_list( { CU_REMOVE_PARENS test_functions } ); \
         CU::TestFunctionsNames test_names = { CU_FOR_EACH(CU_STR_COMMA, CU_REMOVE_PARENS test_functions) }; \
         CU::run_performance_test<repeats_count, result_size_scale_num, result_size_scale_den, strong_less> \
-                (test_path, test_list, test_names, ##__VA_ARGS__ );\
+                (test_path, test_list, test_names __VA_OPT__(,) __VA_ARGS__ );\
     }
 
 #define CU_PERFORMANCE_TEST(name, test_data_path, test_file, test_functions, /* additional args*/...) \
@@ -168,13 +168,13 @@ namespace CU {
 #define CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den, \
             repeats_count, strong_less, function, simd_sets, /* additional args*/...) \
     CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den, \
-        repeats_count, strong_less, ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ), ##__VA_ARGS__ )
+        repeats_count, strong_less, ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ) __VA_OPT__(,) __VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_SIMD(name, test_data_path, test_file, function, simd_sets, /* additional args*/...) \
-    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, false, function, simd_sets, ##__VA_ARGS__ )
+    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, false, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_SIMD_STRONG(name, test_data_path, test_file, function, simd_sets, /* additional args*/...) \
-    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, true, function, simd_sets, ##__VA_ARGS__ )
+    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, true, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
 
 #endif
 
