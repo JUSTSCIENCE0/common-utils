@@ -98,7 +98,7 @@ namespace CU {
         std::vector<float> result_data(result_size);
 
         for (size_t index = 0; index < test_functions.size(); index++) {
-            for (int i = 0; i < repeats_count; i++) {
+            for (size_t i = 0; i < repeats_count; i++) {
                 CU_PROFILE_CHECKBLOCK(performance, test_functions_names[index]);
                 test_functions[index](input_data.data(), input_data.size(), result_data.data());
             }
