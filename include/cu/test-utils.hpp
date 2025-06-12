@@ -135,9 +135,9 @@ namespace CU {
         }
 
 #if defined(CU_PRINT_PERFORMANCE_TEST_RESULT)
-        for (const auto& [timer_id, timer_result] : results) {
-            std::cout << timer_id << ":" << std::endl;
-            std::cout << timer_result << std::endl;
+        for (const auto& func_name : test_functions_names) {
+            std::cout << func_name << ":" << std::endl;
+            std::cout << results[func_name] << std::endl;
         }
 #endif
     }
