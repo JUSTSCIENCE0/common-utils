@@ -72,7 +72,16 @@ namespace CU {
             func(input_data.data(), input_data.size(), result_data.data(), std::forward(additional_args)...);
 
             for (unsigned i = 0; i < output_data.size(); i++) {
-                ASSERT_EQ(output_data[i], result_data[i]) << "Failed control check";
+                if constexpr (std::is_same_v<Unit, float>) {
+                    ASSERT_FLOAT_EQ(output_data[i], result_data[i]) << "Failed control check";
+                }
+                else if constexpr (std::is_same_v<Unit, double>) {
+                    ASSERT_DOUBLE_EQ(output_data[i], result_data[i]) << "Failed control check";
+                }
+                else
+                {
+                    ASSERT_EQ(output_data[i], result_data[i]) << "Failed control check";
+                }
             }
         }
     }
