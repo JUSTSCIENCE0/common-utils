@@ -97,4 +97,33 @@ namespace CU {
 
         return result;
     }
+
+    template <typename T>
+    concept FundamentalContainer = requires(T c) {
+        typename T::value_type;
+        { c.data() } -> std::convertible_to<const typename T::value_type *>;
+        { c.size() } -> std::convertible_to<std::size_t>;
+    } &&
+    std::is_fundamental_v<typename T::value_type>;
+
+    template<FundamentalContainer Container>
+    bool save_data_to_file(const std::filesystem::path& file_name, const Container& values) {
+        std::ofstream file_writer{ file_name, std::ios::binary };
+        if (!file_writer) {
+            // TODO: use log system, instead of stdout
+            std::cout << "failed open file " << file_name << std::endl;
+            return false;
+        }
+
+        if (!file_writer.write(
+                reinterpret_cast<const char*>(values.data()),
+                values.size() * sizeof(typename Container::value_type))) {
+            // TODO: use log system, instead of stdout
+            std::cout << "file " << file_name << " - write error" << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+
 }
