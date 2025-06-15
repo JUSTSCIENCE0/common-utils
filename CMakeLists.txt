@@ -58,6 +58,7 @@ set(INTERFACE_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/simd-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/macro-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/math-utils.hpp
 )
 
 if (ENABLE_CU_TEST_UTILS)
