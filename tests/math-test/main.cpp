@@ -34,24 +34,33 @@ protected:
 };
 
 const EqualityTestSet<float> kFloatCases[] = {
-//    lhs    | rhs    | absolute_epsilon | relative_epsilon | result
-    { 10.0f  , 10.1f  , 1e-3f            , 1e-3f            , false }, // not equal
-    { 10.0f  , 10.01f , 1e-1f            , 1e-3f            , true  }, // equal by absolute_epsilon
-    { 10.0f  , 10.01f , 1e-3f            , 1e-3f            , true  }, // equal by relative_epsilon
+//    lhs     | rhs     | absolute_epsilon | relative_epsilon | result
+    {  10.0f  ,  10.1f  , 1e-3f            , 1e-3f            , false }, // not equal
+    {  10.0f  ,  10.01f , 1e-1f            , 1e-3f            , true  }, // equal by absolute_epsilon
+    {  10.0f  ,  10.01f , 1e-3f            , 1e-3f            , true  }, // equal by relative_epsilon
+    { -10.0f  , -10.1f  , 1e-3f            , 1e-3f            , false }, // negative not equal
+    { -10.0f  , -10.01f , 1e-1f            , 1e-3f            , true  }, // negative equal by absolute_epsilon
+    { -10.0f  , -10.01f , 1e-3f            , 1e-3f            , true  }, // negative equal by relative_epsilon
 };
 
 const EqualityTestSet<double> kDoubleCases[] = {
-//    lhs    | rhs    | absolute_epsilon | relative_epsilon | result
-    { 10.0   , 10.1   , 1e-3             , 1e-3             , false }, // not equal
-    { 10.0   , 10.01  , 1e-1             , 1e-3             , true  }, // equal by absolute_epsilon
-    { 10.0   , 10.01  , 1e-3             , 1e-3             , true  }, // equal by relative_epsilon
+//    lhs     | rhs     | absolute_epsilon | relative_epsilon | result
+    {  10.0   ,  10.1   , 1e-3             , 1e-3             , false }, // not equal
+    {  10.0   ,  10.01  , 1e-1             , 1e-3             , true  }, // equal by absolute_epsilon
+    {  10.0   ,  10.01  , 1e-3             , 1e-3             , true  }, // equal by relative_epsilon
+    { -10.0   , -10.1   , 1e-3             , 1e-3             , false }, // negative not equal
+    { -10.0   , -10.01  , 1e-1             , 1e-3             , true  }, // negative equal by absolute_epsilon
+    { -10.0   , -10.01  , 1e-3             , 1e-3             , true  }, // negative equal by relative_epsilon
 };
 
 const EqualityTestSet<long double> kLongDoubleCases[] = {
-    //    lhs    | rhs    | absolute_epsilon | relative_epsilon | result
-        { 10.0l  , 10.1l  , 1e-3l            , 1e-3l            , false }, // not equal
-        { 10.0l  , 10.01l , 1e-1l            , 1e-3l            , true  }, // equal by absolute_epsilon
-        { 10.0l  , 10.01l , 1e-3l            , 1e-3l            , true  }, // equal by relative_epsilon
+//    lhs     | rhs     | absolute_epsilon | relative_epsilon | result
+    {  10.0l  ,  10.1l  , 1e-3l            , 1e-3l            , false }, // not equal
+    {  10.0l  ,  10.01l , 1e-1l            , 1e-3l            , true  }, // equal by absolute_epsilon
+    {  10.0l  ,  10.01l , 1e-3l            , 1e-3l            , true  }, // equal by relative_epsilon
+    { -10.0l  , -10.1l  , 1e-3l            , 1e-3l            , false }, // negative not equal
+    { -10.0l  , -10.01l , 1e-1l            , 1e-3l            , true  }, // negative equal by absolute_epsilon
+    { -10.0l  , -10.01l , 1e-3l            , 1e-3l            , true  }, // negative equal by relative_epsilon
 };
 
 using FloatEqualityTest = EqualityTest<float>;
