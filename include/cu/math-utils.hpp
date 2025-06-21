@@ -17,7 +17,7 @@ namespace CU {
         if (abs_delta < absolute_epsilon)
             return true;
 
-        auto rel_delta = relative_epsilon * std::max(lhs, rhs);
+        auto rel_delta = relative_epsilon * std::max(std::abs(lhs), std::abs(rhs));
         if (abs_delta < rel_delta)
             return true;
 
