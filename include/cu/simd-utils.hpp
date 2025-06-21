@@ -3,8 +3,6 @@
 //
 // License: MIT
 
-#pragma once
-
 #include <cu/macro-utils.hpp>
 
 #if defined(CU_COMPILE_UNIT_SSE)
@@ -34,7 +32,9 @@
 // macro CU_SIMD(name)
 // Description: Generates an identifier with a postfix corresponding to the current compilation unit.
 //              The format of the compilation unit is defined by the macro CU_COMPILE_UNIT_<current instruction set>.
-#define CU_SIMD(name) CU_EXPAND_CONCAT(name, FUNC_POSTFIX)
+#ifndef CU_SIMD
+#  define CU_SIMD(name) CU_EXPAND_CONCAT(name, FUNC_POSTFIX)
+#endif
 
 #ifdef CU_IMPLEMENTATION_INCLUDE
 #  ifndef CU_IMPLEMENTATION_INCLUDE_EXT
