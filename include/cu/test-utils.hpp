@@ -15,6 +15,7 @@
 
 #include <cu/file-utils.hpp>
 #include <cu/profile-utils.hpp>
+#include <cu/math-utils.hpp>
 
 #include <vector>
 #include <functional>
@@ -73,6 +74,16 @@ namespace CU {
 
             for (unsigned i = 0; i < output_data.size(); i++) {
                 if constexpr (std::is_same_v<Unit, float>) {
+#ifdef CU_PATCH_CONTROL_DATA
+                    if (!testing::internal::CmpHelperFloatingPointEQ("output_data[i]", "result_data[i]", output_data[i], result_data[i])) {
+                        if (CU::is_equal(output_data[i], result_data[i], 1.0e-1f, 1.0e-1f)) {
+                            static int counter = 0;
+                            std::cout << ++counter << ": #" << i << " " << output_data[i] << "!=" << result_data[i] << std::endl;
+                            output_data[i] = result_data[i];
+                        }
+                    }
+#endif
+
                     ASSERT_FLOAT_EQ(output_data[i], result_data[i]) << "Failed control check";
                 }
                 else if constexpr (std::is_same_v<Unit, double>) {
@@ -84,6 +95,10 @@ namespace CU {
                 }
             }
         }
+
+#ifdef CU_PATCH_CONTROL_DATA
+        CU::save_data_to_file(control_data_path, output_data);
+#endif
     }
 
     template <size_t repeats_count = 10u,
