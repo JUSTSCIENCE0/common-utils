@@ -21,6 +21,24 @@
 #include <functional>
 #include <initializer_list>
 
+// TODO: doc test utils interface
+// flags
+//      CU_PATCH_CONTROL_DATA,
+//      CU_ENABLE_DEBUG_PERFORMANCE_TEST,
+//      CU_PRINT_PERFORMANCE_TEST_RESULT
+// macros
+//      CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, test_functions, additional_args)
+//      CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, simd_sets, additional_args)
+//      CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den,
+//                                       repeats_count, strong_less, test_functions, additional_args )
+//      CU_PERFORMANCE_TEST(name, test_data_path, test_file, test_functions, additional_args)
+//      CU_PERFORMANCE_TEST_STRONG(name, test_data_path, test_file, test_functions, additional_args)
+//      CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den,
+//                                       repeats_count, strong_less, function, simd_sets, additional_args)
+//      CU_PERFORMANCE_TEST_SIMD(name, test_data_path, test_file, function, simd_sets, additional_args)
+//      CU_PERFORMANCE_TEST_SIMD_STRONG(name, test_data_path, test_file, function, simd_sets, additional_args)
+//
+
 namespace CU {
     template <typename Unit, typename... AdditionalArgs>
         requires std::is_fundamental_v<Unit>
@@ -158,7 +176,7 @@ namespace CU {
     }
 }
 
-#define CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, test_functions, /* additional args*/...) \
+#define CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, test_functions, /* additional_args */...) \
     TEST(Conformance, name) { \
         std::filesystem::path test_path{ test_data_path }; \
         test_path.append(test_file); \
@@ -168,12 +186,13 @@ namespace CU {
         CU::run_conformance_test(test_path, control_path, test_list __VA_OPT__(,) __VA_ARGS__); \
     }
 
-#define CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, simd_sets, /* additional args*/...) \
+#define CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, simd_sets, /* additional_args */...) \
     CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, \
         ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ) __VA_OPT__(,) __VA_ARGS__ )
 
+#if defined(NDEBUG) || defined(CU_ENABLE_DEBUG_PERFORMANCE_TEST)
 #define CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den, \
-            repeats_count, strong_less, test_functions, /* additional args*/...) \
+            repeats_count, strong_less, test_functions, /* additional_args */...) \
     TEST(Performance, name) { \
         std::filesystem::path test_path{ test_data_path }; \
         test_path.append(test_file); \
@@ -182,22 +201,25 @@ namespace CU {
         CU::run_performance_test<repeats_count, result_size_scale_num, result_size_scale_den, strong_less> \
                 (test_path, test_list, test_names __VA_OPT__(,) __VA_ARGS__ );\
     }
+#else
+#define CU_PERFORMANCE_TEST_CONFIGURABLE(...)
+#endif
 
-#define CU_PERFORMANCE_TEST(name, test_data_path, test_file, test_functions, /* additional args*/...) \
+#define CU_PERFORMANCE_TEST(name, test_data_path, test_file, test_functions, /* additional_args */...) \
     CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, false, test_functions, ##__VA_ARGS__ )
 
-#define CU_PERFORMANCE_TEST_STRONG(name, test_data_path, test_file, test_functions, /* additional args*/...) \
+#define CU_PERFORMANCE_TEST_STRONG(name, test_data_path, test_file, test_functions, /* additional_args */...) \
     CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, true, test_functions, ##__VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den, \
-            repeats_count, strong_less, function, simd_sets, /* additional args*/...) \
+            repeats_count, strong_less, function, simd_sets, /* additional_args */...) \
     CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den, \
         repeats_count, strong_less, ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ) __VA_OPT__(,) __VA_ARGS__ )
 
-#define CU_PERFORMANCE_TEST_SIMD(name, test_data_path, test_file, function, simd_sets, /* additional args*/...) \
+#define CU_PERFORMANCE_TEST_SIMD(name, test_data_path, test_file, function, simd_sets, /* additional_args */...) \
     CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, false, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
 
-#define CU_PERFORMANCE_TEST_SIMD_STRONG(name, test_data_path, test_file, function, simd_sets, /* additional args*/...) \
+#define CU_PERFORMANCE_TEST_SIMD_STRONG(name, test_data_path, test_file, function, simd_sets, /* additional_args */...) \
     CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, true, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
 
 #endif
