@@ -119,6 +119,8 @@ namespace CU {
 #endif
     }
 
+    static constexpr double WORSE_ACCELERATION_RATIO = 0.75;
+
     template <size_t repeats_count = 10u,
               size_t result_size_scale_num = 1u,
               size_t result_size_scale_den = 1u,
@@ -148,31 +150,34 @@ namespace CU {
 
         auto results = CU_PROFILE_GET_RESULTS(test_functions_names);
         ASSERT_NE(results.find(test_functions_names[0]), results.end()) << "Profiler implementation error";
-        auto prev_avg_ns = results[test_functions_names[0]].GetAvgNS();
+        auto& func_name = test_functions_names[0];
+        auto prev_avg_ns = results[func_name].GetAvgNS();
+#if defined(CU_PRINT_PERFORMANCE_TEST_RESULT)
+        std::cout << func_name << ":" << std::endl;
+        std::cout << results[func_name] << std::endl;
+#endif
 
         for (size_t index = 1; index < test_functions.size(); index++) {
             ASSERT_NE(results.find(test_functions_names[index]), results.end()) << "Profiler implementation error";
 
-            const auto current_avg_ns = results[test_functions_names[index]].GetAvgNS();
+            func_name = test_functions_names[index];
+            const auto current_avg_ns = results[func_name].GetAvgNS();
+            double acr_ratio = double(prev_avg_ns) / double(current_avg_ns);
+#if defined(CU_PRINT_PERFORMANCE_TEST_RESULT)
+            std::cout << func_name << ":" << std::endl;
+            std::cout << results[func_name];
+            std::cout << "\tacceleration ratio: " << acr_ratio << std::endl << std::endl;
+#endif
 
             if (current_avg_ns >= prev_avg_ns) {
-                EXPECT_FALSE(strong_less) << "Subsequent implementation is not faster than the previous one";
+                ASSERT_FALSE(strong_less) << "Subsequent implementation is not faster than the previous one";
 
                 // check if results almost equal
-                auto epsilon_ns = prev_avg_ns / 2;
-                auto delta_ns = current_avg_ns - prev_avg_ns;
-                EXPECT_LE(delta_ns, epsilon_ns) << "Subsequent implementation is significantly slower than the previous one";
+                EXPECT_LE(WORSE_ACCELERATION_RATIO, acr_ratio) << "Subsequent implementation is significantly slower than the previous one";
             }
 
             prev_avg_ns = current_avg_ns;
         }
-
-#if defined(CU_PRINT_PERFORMANCE_TEST_RESULT)
-        for (const auto& func_name : test_functions_names) {
-            std::cout << func_name << ":" << std::endl;
-            std::cout << results[func_name] << std::endl;
-        }
-#endif
     }
 }
 
