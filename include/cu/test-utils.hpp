@@ -119,7 +119,7 @@ namespace CU {
 #endif
     }
 
-    static constexpr double WORSE_ACCELERATION_RATIO = 0.75;
+    static constexpr double WORSE_ACCELERATION_RATIO = 0.5;
 
     template <size_t repeats_count = 10u,
               size_t result_size_scale_num = 1u,
