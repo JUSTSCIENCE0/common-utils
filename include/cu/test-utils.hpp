@@ -211,10 +211,10 @@ namespace CU {
 #endif
 
 #define CU_PERFORMANCE_TEST(name, test_data_path, test_file, test_functions, /* additional_args */...) \
-    CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, false, test_functions, ##__VA_ARGS__ )
+    CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 100, false, test_functions, ##__VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_STRONG(name, test_data_path, test_file, test_functions, /* additional_args */...) \
-    CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, true, test_functions, ##__VA_ARGS__ )
+    CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 100, true, test_functions, ##__VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den, \
             repeats_count, strong_less, function, simd_sets, /* additional_args */...) \
@@ -222,10 +222,10 @@ namespace CU {
         repeats_count, strong_less, ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ) __VA_OPT__(,) __VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_SIMD(name, test_data_path, test_file, function, simd_sets, /* additional_args */...) \
-    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, false, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
+    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 100, false, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
 
 #define CU_PERFORMANCE_TEST_SIMD_STRONG(name, test_data_path, test_file, function, simd_sets, /* additional_args */...) \
-    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 10, true, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
+    CU_PERFORMANCE_TEST_SIMD_CONFIGURABLE(name, test_data_path, test_file, 1, 1, 100, true, function, simd_sets __VA_OPT__(,) __VA_ARGS__ )
 
 #endif
 
