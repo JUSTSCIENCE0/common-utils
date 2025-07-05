@@ -104,26 +104,26 @@ namespace CU {
             ADD_INSTRACTIONS_SET( AVX,                 REG_1_0, ECX, 28 ) \
             ADD_INSTRACTIONS_SET( AVX2,                REG_7_0, EBX, 5  ) \
         END_INSTRUCTIONS_FAMILY(AVX)                                      \
-        BEGIN_INSTRUCTIONS_FAMILY(AVX_512)                                \
-            ADD_INSTRACTIONS_SET( AVX_512F,            REG_7_0, EBX, 16 ) \
-            ADD_INSTRACTIONS_SET( AVX_512PF,           REG_7_0, EBX, 26 ) \
-            ADD_INSTRACTIONS_SET( AVX_512ER,           REG_7_0, EBX, 27 ) \
-            ADD_INSTRACTIONS_SET( AVX_512CD,           REG_7_0, EBX, 28 ) \
-            ADD_INSTRACTIONS_SET( AVX_512BW,           REG_7_0, EBX, 30 ) \
-            ADD_INSTRACTIONS_SET( AVX_512DQ,           REG_7_0, EBX, 17 ) \
-            ADD_INSTRACTIONS_SET( AVX_512VL,           REG_7_0, EBX, 31 ) \
-            ADD_INSTRACTIONS_SET( AVX_512IFMA,         REG_7_0, EBX, 21 ) \
-            ADD_INSTRACTIONS_SET( AVX_512VBMI,         REG_7_0, ECX, 1  ) \
-            ADD_INSTRACTIONS_SET( AVX_512VBMI2,        REG_7_0, ECX, 6  ) \
-            ADD_INSTRACTIONS_SET( AVX_512VNNI,         REG_7_0, ECX, 11 ) \
-            ADD_INSTRACTIONS_SET( AVX_512BITALG,       REG_7_0, ECX, 12 ) \
-            ADD_INSTRACTIONS_SET( AVX_512BF16,         REG_7_1, EAX, 5  ) \
-            ADD_INSTRACTIONS_SET( AVX_512VPOPCNTDQ,    REG_7_0, ECX, 14 ) \
-            ADD_INSTRACTIONS_SET( AVX_512VP2INTERSECT, REG_7_0, EDX, 8  ) \
-            ADD_INSTRACTIONS_SET( AVX_5124FMAPS,       REG_7_0, EDX, 3  ) \
-            ADD_INSTRACTIONS_SET( AVX_5124VNNIW,       REG_7_0, EDX, 2  ) \
-            ADD_INSTRACTIONS_SET( AVX_512FP16,         REG_7_0, EDX, 23 ) \
-        END_INSTRUCTIONS_FAMILY(AVX_512)                                  \
+        BEGIN_INSTRUCTIONS_FAMILY(AVX512)                                 \
+            ADD_INSTRACTIONS_SET( AVX512F,             REG_7_0, EBX, 16 ) \
+            ADD_INSTRACTIONS_SET( AVX512PF,            REG_7_0, EBX, 26 ) \
+            ADD_INSTRACTIONS_SET( AVX512ER,            REG_7_0, EBX, 27 ) \
+            ADD_INSTRACTIONS_SET( AVX512CD,            REG_7_0, EBX, 28 ) \
+            ADD_INSTRACTIONS_SET( AVX512BW,            REG_7_0, EBX, 30 ) \
+            ADD_INSTRACTIONS_SET( AVX512DQ,            REG_7_0, EBX, 17 ) \
+            ADD_INSTRACTIONS_SET( AVX512VL,            REG_7_0, EBX, 31 ) \
+            ADD_INSTRACTIONS_SET( AVX512IFMA,          REG_7_0, EBX, 21 ) \
+            ADD_INSTRACTIONS_SET( AVX512VBMI,          REG_7_0, ECX, 1  ) \
+            ADD_INSTRACTIONS_SET( AVX512VBMI2,         REG_7_0, ECX, 6  ) \
+            ADD_INSTRACTIONS_SET( AVX512VNNI,          REG_7_0, ECX, 11 ) \
+            ADD_INSTRACTIONS_SET( AVX512BITALG,        REG_7_0, ECX, 12 ) \
+            ADD_INSTRACTIONS_SET( AVX512BF16,          REG_7_1, EAX, 5  ) \
+            ADD_INSTRACTIONS_SET( AVX512VPOPCNTDQ,     REG_7_0, ECX, 14 ) \
+            ADD_INSTRACTIONS_SET( AVX512VP2INTERSECT,  REG_7_0, EDX, 8  ) \
+            ADD_INSTRACTIONS_SET( AVX5124FMAPS,        REG_7_0, EDX, 3  ) \
+            ADD_INSTRACTIONS_SET( AVX5124VNNIW,        REG_7_0, EDX, 2  ) \
+            ADD_INSTRACTIONS_SET( AVX512FP16,          REG_7_0, EDX, 23 ) \
+        END_INSTRUCTIONS_FAMILY(AVX512)                                   \
     END_INSTRUCTIONS_FAMILIES_LIST
 
 #endif //  CU_ARCH_X86_64
