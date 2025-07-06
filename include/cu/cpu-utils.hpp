@@ -346,8 +346,8 @@ namespace CU {
     static inline bool is_function_can_be_run(const std::string& function_name) {
         size_t pos = function_name.rfind('_');
         if (pos == std::string::npos) {
-            // we don't have postfix
-            return false;
+            // we don't have postfix - it's regular function, we can run it
+            return true;
         }
 
         auto func_postfix = function_name.substr(pos + 1);
@@ -366,7 +366,7 @@ namespace CU {
         if (DEFAULT_INFAM != infam)
             return is_infam_supported(infam);
 
-        // unknown postfix
-        return false;
+        // unknown postfix - it's regular function, we can run it
+        return true;
     }
 }
