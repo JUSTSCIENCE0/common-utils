@@ -16,6 +16,7 @@
 #include <cu/file-utils.hpp>
 #include <cu/profile-utils.hpp>
 #include <cu/math-utils.hpp>
+#include <cu/cpu-utils.hpp>
 
 #include <vector>
 #include <functional>
@@ -140,27 +141,33 @@ namespace CU {
 
         size_t result_size = input_data.size() * result_size_scale_num / result_size_scale_den;
         std::vector<float> result_data(result_size);
+        size_t call_functions_count = 0;
 
         for (size_t index = 0; index < test_functions.size(); index++) {
-            for (size_t i = 0; i < repeats_count; i++) {
-                CU_PROFILE_CHECKBLOCK(performance, test_functions_names[index]);
-                test_functions[index](input_data.data(), input_data.size(), result_data.data());
+            if (is_function_can_be_run(test_functions_names[index])) {
+                for (size_t i = 0; i < repeats_count; i++) {
+                    CU_PROFILE_CHECKBLOCK(performance, test_functions_names[index]);
+                    test_functions[index](input_data.data(), input_data.size(), result_data.data());
+                }
+                call_functions_count++;
+            }
+            else {
+                std::cout << "WARNING: function \"" << test_functions_names[index] <<
+                    "\" cannot be run on current hardware" << std::endl;
             }
         }
 
+        ASSERT_NE(call_functions_count, 0) << "no functions were called";
+
         auto results = CU_PROFILE_GET_RESULTS(test_functions_names);
-        ASSERT_NE(results.find(test_functions_names[0]), results.end()) << "Profiler implementation error";
-        auto& func_name = test_functions_names[0];
-        auto prev_avg_ns = results[func_name].GetAvgNS();
-#if defined(CU_PRINT_PERFORMANCE_TEST_RESULT)
-        std::cout << func_name << ":" << std::endl;
-        std::cout << results[func_name] << std::endl;
-#endif
+        EXPECT_EQ(results.size(), call_functions_count) << "Profiler implementation error";
+        int64_t prev_avg_ns = 0;
 
-        for (size_t index = 1; index < test_functions.size(); index++) {
-            ASSERT_NE(results.find(test_functions_names[index]), results.end()) << "Profiler implementation error";
+        for (size_t index = 0; index < test_functions.size(); index++) {
+            if (results.end() == results.find(test_functions_names[index]))
+                continue;
 
-            func_name = test_functions_names[index];
+            const auto& func_name = test_functions_names[index];
             const auto current_avg_ns = results[func_name].GetAvgNS();
             double acr_ratio = double(prev_avg_ns) / double(current_avg_ns);
 #if defined(CU_PRINT_PERFORMANCE_TEST_RESULT)
@@ -169,7 +176,7 @@ namespace CU {
             std::cout << "\tacceleration ratio: " << acr_ratio << std::endl << std::endl;
 #endif
 
-            if (current_avg_ns >= prev_avg_ns) {
+            if (prev_avg_ns && current_avg_ns >= prev_avg_ns) {
                 ASSERT_FALSE(strong_less) << "Subsequent implementation is not faster than the previous one";
 
                 // check if results almost equal
