@@ -8,7 +8,9 @@
 #include <stdlib.h>
 
 #include <array>
+#include <algorithm>
 #include <unordered_map>
+#include <cctype>
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -46,6 +48,7 @@ static inline void __cpuidex(   int cpuInfo[4], int function_id, int subfunction
 #endif // CU_ARCH_X86_64
 
 namespace CU {
+    static constexpr auto DEFAULT_INFAM = std::numeric_limits<int>::max();
     static constexpr auto DEFAULT_INSET = std::numeric_limits<int>::max();
 
     typedef int InstructionsFamily;
@@ -316,5 +319,54 @@ namespace CU {
 
     static inline bool is_inset_supported(InstructionsSet inset) {
         return is_inset_supported(CURRENT_CPU_CONFIGURATION, inset);
+    }
+
+    static inline bool is_infam_supported(InstructionsFamily infam) {
+        return is_infam_supported(CURRENT_CPU_CONFIGURATION, infam);
+    }
+
+    static inline InstructionsFamily get_infam_by_name(const char* family_name) {
+        for (InstructionsFamily infam = E_INFAM_BEGIN; infam < E_INFAM_END; infam++) {
+            if (!std::strcmp(STR_INSTRUCTIONS_FAMILY[infam], family_name))
+                return infam;
+        }
+        return DEFAULT_INFAM;
+    }
+
+    static inline InstructionsSet get_inset_by_name(const char* set_name) {
+        for (InstructionsFamily infam = E_INFAM_BEGIN; infam < E_INFAM_END; infam++) {
+            for (int inset_index = 0; inset_index < get_insets_count_for_infam(infam); inset_index++) {
+                if (!std::strcmp(STR_INSTRUCTIONS_SETS[infam][inset_index], set_name))
+                    return (infam << 16) + inset_index;
+            }
+        }
+        return DEFAULT_INSET;
+    }
+
+    static inline bool is_function_can_be_run(const std::string& function_name) {
+        size_t pos = function_name.rfind('_');
+        if (pos == std::string::npos) {
+            // we don't have postfix
+            return false;
+        }
+
+        auto func_postfix = function_name.substr(pos + 1);
+        std::transform(func_postfix.begin(), func_postfix.end(), func_postfix.begin(),
+            [](unsigned char c) { return std::toupper(c); });
+        if (func_postfix == "DEF") {
+            // it's default function
+            return true;
+        }
+
+        auto inset = get_inset_by_name(func_postfix.c_str());
+        if (DEFAULT_INSET != inset)
+            return is_inset_supported(inset);
+
+        auto infam = get_infam_by_name(func_postfix.c_str());
+        if (DEFAULT_INFAM != infam)
+            return is_infam_supported(infam);
+
+        // unknown postfix
+        return false;
     }
 }
