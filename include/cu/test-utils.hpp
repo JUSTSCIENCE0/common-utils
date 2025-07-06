@@ -79,6 +79,7 @@ namespace CU {
             const std::filesystem::path& test_data_path,
             const std::filesystem::path& control_data_path,
             TestFunctionsList<Unit, AdditionalArgs...> test_functions,
+            TestFunctionsNames test_functions_names,
             AdditionalArgs... additional_args) {
         auto input_data = CU::load_data_from_file<Unit>(test_data_path);
         ASSERT_FALSE(input_data.empty()) << "Failed to load test data";
@@ -88,8 +89,14 @@ namespace CU {
 
         std::vector<Unit> result_data(output_data.size());
 
-        for (auto func : test_functions) {
-            func(input_data.data(), input_data.size(), result_data.data(), std::forward(additional_args)...);
+        for (size_t index = 0; index < test_functions.size(); index++) {
+            if (!is_function_can_be_run(test_functions_names[index])) {
+                std::cout << "WARNING: function \"" << test_functions_names[index] <<
+                    "\" cannot be run on current hardware" << std::endl;
+                continue;
+            }
+
+            test_functions[index](input_data.data(), input_data.size(), result_data.data(), std::forward(additional_args)...);
 
             for (unsigned i = 0; i < output_data.size(); i++) {
                 if constexpr (std::is_same_v<Unit, float>) {
@@ -195,7 +202,8 @@ namespace CU {
         std::filesystem::path control_path{test_data_path}; \
         control_path.append(control_file); \
         auto test_list = CU::make_test_functions_list( { CU_REMOVE_PARENS test_functions } ); \
-        CU::run_conformance_test(test_path, control_path, test_list __VA_OPT__(,) __VA_ARGS__); \
+        CU::TestFunctionsNames test_names = { CU_FOR_EACH(CU_STR_COMMA, CU_REMOVE_PARENS test_functions) }; \
+        CU::run_conformance_test(test_path, control_path, test_list, test_names __VA_OPT__(,) __VA_ARGS__); \
     }
 
 #define CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, simd_sets, /* additional_args */...) \
