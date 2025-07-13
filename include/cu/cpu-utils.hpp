@@ -343,6 +343,9 @@ namespace CU {
         return DEFAULT_INSET;
     }
 
+    // Determines whether a function can be executed on the current hardware based on its postfix (e.g., _sse, _avx512, etc.).
+    // WARNING: The postfix may not contain sufficient information to determine the full set of required instruction sets.
+    // Use this function with caution.
     static inline bool is_function_can_be_run(const std::string& function_name) {
         size_t pos = function_name.rfind('_');
         if (pos == std::string::npos) {
