@@ -27,6 +27,26 @@ function(set_simd_compile_unit_flag
     )
 endfunction()
 
+function(parse_simd_sets_group
+    sets_group
+    is_single
+    sets_list
+)
+    string(REGEX MATCH "[()]" HAS_PAREN "${${sets_group}}")
+    if (NOT HAS_PAREN)
+        set(${is_single} TRUE PARENT_SCOPE)
+        return()
+    endif()
+
+    set(${is_single} FALSE PARENT_SCOPE)
+    string(REGEX MATCH "^[^(]+" SET_NAME "${${sets_group}}")
+    string(REGEX REPLACE "^[^(]*\\(([^)]*)\\).*" "\\1" ARGS "${${sets_group}}")
+    string(REPLACE "," ";" ARGS "${ARGS}")
+
+    set(${sets_group} ${SET_NAME} PARENT_SCOPE)
+    set(${sets_list} ${ARGS} PARENT_SCOPE)
+endfunction()
+
 # interface
 
 # For the given implementation of a function or class,
@@ -62,6 +82,8 @@ function(generate_simd_compile_units
     set(CU_SIMD_SUPPORT_AVX512 0)
 
     foreach(supported_set IN LISTS ARGN)
+        parse_simd_sets_group(supported_set is_single sets_list)
+
         set(SUPPORT_FLAG_NAME "CU_SIMD_SUPPORT_${supported_set}")
         set(${SUPPORT_FLAG_NAME} 1)
         set(CURRENT_SUPPORTED_SET ${supported_set})
@@ -72,7 +94,14 @@ function(generate_simd_compile_units
         configure_file(${COMPILE_UNIT_TEMPLATE} ${GENERATED_FILE} @ONLY)
         set(GENERATED_FILES ${GENERATED_FILES} ${GENERATED_FILE})
 
-        set_simd_compile_unit_flag(${GENERATED_FILE} ${supported_set})
+        if (is_single OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+            set_simd_compile_unit_flag(${GENERATED_FILE} ${supported_set})
+        else()
+            foreach(set_postfix IN LISTS sets_list)
+                set(full_set_name "${supported_set}${set_postfix}")
+                set_simd_compile_unit_flag(${GENERATED_FILE} ${full_set_name})
+            endforeach()
+        endif()
     endforeach()
 
     # generate interface header
