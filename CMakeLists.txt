@@ -127,13 +127,25 @@ target_include_directories(common-utils
 )
 
 # CPU identifiers
+message(STATUS "CPU Architecture - ${CMAKE_SYSTEM_PROCESSOR}")
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
-    message(STATUS "CPU Architecture - ${CMAKE_SYSTEM_PROCESSOR}")
     target_compile_definitions(common-utils PUBLIC CU_ARCH_X86_64)
 #elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")  TODO
 #elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")      TODO
 else()
     message(FATAL_ERROR "Unsupported CPU Architecture - ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+# Compiler identifiers
+message(STATUS "Compiler - ${CMAKE_CXX_COMPILER_ID}")
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_compile_definitions(common-utils PUBLIC CU_COMPILER_MSVC)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_definitions(common-utils PUBLIC CU_COMPILER_CLANG)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_definitions(common-utils PUBLIC CU_COMPILER_GCC)
+else()
+    message(FATAL_ERROR "Unsupported Compiler - ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}" SOURCE_DIR_LENGTH)
