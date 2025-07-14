@@ -28,8 +28,10 @@
 //      CU_ENABLE_DEBUG_PERFORMANCE_TEST,
 //      CU_PRINT_PERFORMANCE_TEST_RESULT
 // macros
+//      CU_CONFORMANCE_TEST_CONFIGURABLE(is_weak, name, test_data_path, test_file, control_file, test_functions, additional_args)
 //      CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, test_functions, additional_args)
 //      CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, simd_sets, additional_args)
+//      CU_CONFORMANCE_TEST_SIMD_WEAK(name, test_data_path, test_file, control_file, function, simd_sets, additional_args)
 //      CU_PERFORMANCE_TEST_CONFIGURABLE(name, test_data_path, test_file, result_size_scale_num, result_size_scale_den,
 //                                       repeats_count, strong_less, test_functions, additional_args )
 //      CU_PERFORMANCE_TEST(name, test_data_path, test_file, test_functions, additional_args)
@@ -73,7 +75,7 @@ namespace CU {
         return TestFunctionsList<Unit, AdditionalArgs...>(functions);
     }
 
-    template <typename Unit, typename... AdditionalArgs>
+    template <bool IsWeakCompare = false, typename Unit, typename... AdditionalArgs>
         requires std::is_fundamental_v<Unit>
     void run_conformance_test(
             const std::filesystem::path& test_data_path,
@@ -100,15 +102,17 @@ namespace CU {
 
             for (unsigned i = 0; i < output_data.size(); i++) {
                 if constexpr (std::is_same_v<Unit, float>) {
+                    if constexpr (IsWeakCompare) {
+                        if (!testing::internal::CmpHelperFloatingPointEQ("output_data[i]", "result_data[i]", output_data[i], result_data[i])) {
+                            if (CU::is_equal(output_data[i], result_data[i], 1.0e-1f, 1.0e-1f)) {
 #ifdef CU_PATCH_CONTROL_DATA
-                    if (!testing::internal::CmpHelperFloatingPointEQ("output_data[i]", "result_data[i]", output_data[i], result_data[i])) {
-                        if (CU::is_equal(output_data[i], result_data[i], 1.0e-1f, 1.0e-1f)) {
-                            static int counter = 0;
-                            std::cout << ++counter << ": #" << i << " " << output_data[i] << "!=" << result_data[i] << std::endl;
-                            output_data[i] = result_data[i];
+                                static int counter = 0;
+                                std::cout << ++counter << ": #" << i << " " << output_data[i] << "!=" << result_data[i] << std::endl;
+#endif
+                                output_data[i] = result_data[i];
+                            }
                         }
                     }
-#endif
 
                     ASSERT_FLOAT_EQ(output_data[i], result_data[i]) << "Failed control check";
                 }
@@ -195,7 +199,7 @@ namespace CU {
     }
 }
 
-#define CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, test_functions, /* additional_args */...) \
+#define CU_CONFORMANCE_TEST_CONFIGURABLE(is_weak, name, test_data_path, test_file, control_file, test_functions, /* additional_args */...) \
     TEST(Conformance, name) { \
         std::filesystem::path test_path{ test_data_path }; \
         test_path.append(test_file); \
@@ -203,11 +207,18 @@ namespace CU {
         control_path.append(control_file); \
         auto test_list = CU::make_test_functions_list( { CU_REMOVE_PARENS test_functions } ); \
         CU::TestFunctionsNames test_names = { CU_FOR_EACH(CU_STR_COMMA, CU_REMOVE_PARENS test_functions) }; \
-        CU::run_conformance_test(test_path, control_path, test_list, test_names __VA_OPT__(,) __VA_ARGS__); \
+        CU::run_conformance_test<is_weak>(test_path, control_path, test_list, test_names __VA_OPT__(,) __VA_ARGS__); \
     }
+
+#define CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, test_functions, /* additional_args */...) \
+    CU_CONFORMANCE_TEST_CONFIGURABLE(false, name, test_data_path, test_file, control_file, test_functions __VA_OPT__(,) __VA_ARGS__ )
 
 #define CU_CONFORMANCE_TEST_SIMD(name, test_data_path, test_file, control_file, function, simd_sets, /* additional_args */...) \
     CU_CONFORMANCE_TEST(name, test_data_path, test_file, control_file, \
+        ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ) __VA_OPT__(,) __VA_ARGS__ )
+
+#define CU_CONFORMANCE_TEST_SIMD_WEAK(name, test_data_path, test_file, control_file, function, simd_sets, /* additional_args */...) \
+    CU_CONFORMANCE_TEST_CONFIGURABLE(true, name, test_data_path, test_file, control_file, \
         ( CU_CONCAT_FOR_EACH(function, CU_REMOVE_PARENS simd_sets) ) __VA_OPT__(,) __VA_ARGS__ )
 
 #if defined(NDEBUG) || defined(CU_ENABLE_DEBUG_PERFORMANCE_TEST)
