@@ -11,6 +11,7 @@
 #include <fstream>
 #include <vector>
 #include <cstring>
+#include <ranges>
 
 #if defined(_WIN32)
 #define NOMINMAX
@@ -98,13 +99,52 @@ namespace CU {
         return result;
     }
 
+    template<typename Unit>
+    requires std::is_fundamental_v<Unit>
+    std::vector<Unit> load_data_from_text_file(const std::filesystem::path& file_name) {
+        // TODO: support delimiter
+        if (!std::filesystem::exists(file_name)) {
+            // TODO: use log system, instead of stdout
+            std::cout << "selected file " << file_name << " doesn't exist" << std::endl;
+            return {};
+        }
+
+        std::ifstream file_reader{ file_name };
+        if (!file_reader) {
+            // TODO: use log system, instead of stdout
+            std::cout << "failed open file " << file_name << std::endl;
+            return {};
+        }
+
+        std::vector<Unit> result;
+        Unit value;
+        while (!file_reader.eof() && !file_reader.fail()) {
+            while (file_reader >> value) {
+                result.push_back(value);
+            }
+
+            if (file_reader.fail() && !file_reader.eof()) {
+                file_reader.clear();
+
+                std::string bad_part;
+                file_reader >> bad_part;
+
+                // TODO: use log system, instead of stdout
+                std::cout << "error when read file, skip unsupported block '" << bad_part << "'" << std::endl;
+            }
+        }
+
+        return result;
+    }
+
     template <typename T>
     concept FundamentalContainer = requires(T c) {
         typename T::value_type;
         { c.data() } -> std::convertible_to<const typename T::value_type *>;
         { c.size() } -> std::convertible_to<std::size_t>;
     } &&
-    std::is_fundamental_v<typename T::value_type>;
+    std::is_fundamental_v<typename T::value_type> &&
+    std::ranges::range<T>;
 
     template<FundamentalContainer Container>
     bool save_data_to_file(const std::filesystem::path& file_name, const Container& values) {
@@ -121,6 +161,27 @@ namespace CU {
             // TODO: use log system, instead of stdout
             std::cout << "file " << file_name << " - write error" << std::endl;
             return false;
+        }
+
+        return true;
+    }
+
+    template<FundamentalContainer Container>
+    bool save_data_to_text_file(const std::filesystem::path& file_name, const Container& values) {
+        std::ofstream file_writer{ file_name };
+        if (!file_writer) {
+            // TODO: use log system, instead of stdout
+            std::cout << "failed open file " << file_name << std::endl;
+            return false;
+        }
+
+        for (const auto& value : values) {
+            file_writer << value << std::endl;
+            if (!file_writer) {
+                // TODO: use log system, instead of stdout
+                std::cout << "file " << file_name << " - write error" << std::endl;
+                return false;
+            }
         }
 
         return true;
