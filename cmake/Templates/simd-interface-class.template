@@ -13,20 +13,20 @@
 
 // Common
 
-#define CU_SIMD_CTOR(name, /*args*/...) explicit CU_SIMD_CLASS_NAME(name)(__VA_ARGS__)
-#define CU_SIMD_DTOR(name) virtual ~CU_SIMD_CLASS_NAME(name)()
+#define CU_SIMD_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__)
+#define CU_SIMD_DTOR virtual ~CU_SIMD_CLASS_NAME ()
 
 // Base class
 
-#define CU_SIMD_BASE_CTOR(name, /*args*/...) explicit name(__VA_ARGS__)
-#define CU_SIMD_EXTRA_CTOR(name, /*args*/...)
+#define CU_SIMD_BASE_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__)
+#define CU_SIMD_EXTRA_CTOR(/*args*/...)
 #define CU_SIMD_BASE_MTD(ret, name, /*args*/...) ret name(__VA_ARGS__)
 #define CU_SIMD_EXTRA_MTD(ret, name, /*args*/...)
 #define CU_SIMD_ABSTRACT_MTD(ret, name, /*args*/...) virtual ret name(__VA_ARGS__) = 0
 #define CU_SIMD_BASE_ATTR(type, name, def) type name = def
 #define CU_SIMD_EXTRA_ATTR(type, name, def)
-#define CU_SIMD_CLASS_NAME(name) name
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name)
+#define CU_SIMD_CLASS_NAME @BASE_CLASS_NAME@
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME
 
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 
@@ -42,8 +42,8 @@
 
 // Child classes
 
-#define CU_SIMD_BASE_CTOR(name, /*args*/...)
-#define CU_SIMD_EXTRA_CTOR(name, /*args*/...) explicit name(__VA_ARGS__)
+#define CU_SIMD_BASE_CTOR(/*args*/...)
+#define CU_SIMD_EXTRA_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__)
 #define CU_SIMD_BASE_MTD(ret, name, /*args*/...)
 #define CU_SIMD_EXTRA_MTD(ret, name, /*args*/...) ret name(__VA_ARGS__)
 #define CU_SIMD_ABSTRACT_MTD(ret, name, /*args*/...) virtual ret name(__VA_ARGS__) override
@@ -51,80 +51,80 @@
 #define CU_SIMD_EXTRA_ATTR(type, name, def) type name = def
 
 #if @CU_SIMD_SUPPORT_DEF@ // CU_SIMD_SUPPORT_DEF
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, DEF)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, DEF)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_SSE@ // CU_SIMD_SUPPORT_SSE
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, SSE)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, SSE)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_SSE2@ // CU_SIMD_SUPPORT_SSE2
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, SSE2)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, SSE2)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_SSE3@ // CU_SIMD_SUPPORT_SSE3
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, SSE3)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, SSE3)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_SSSE3@ // CU_SIMD_SUPPORT_SSSE3
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, SSSE3)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, SSSE3)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_SSE4_1@ // CU_SIMD_SUPPORT_SSE4_1
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, SSE4_1)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, SSE4_1)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_SSE4_2@ // CU_SIMD_SUPPORT_SSE4_2
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, SSE4_2)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, SSE4_2)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_AVX@ // CU_SIMD_SUPPORT_AVX
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, AVX)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, AVX)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_AVX2@ // CU_SIMD_SUPPORT_AVX2
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, AVX2)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, AVX2)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME
 #endif
 
 #if @CU_SIMD_SUPPORT_AVX512@ // CU_SIMD_SUPPORT_AVX512
-#define CU_SIMD_CLASS_NAME(name) CU_CONT_CONCAT(name, AVX512)
-#define CU_SIMD_CLASS(name) CU_SIMD_CLASS_NAME(name) : public name
+#define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, AVX512)
+#define CU_SIMD_CLASS CU_SIMD_CLASS_NAME : public @BASE_CLASS_NAME@
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 #undef CU_SIMD_CLASS
 #undef CU_SIMD_CLASS_NAME

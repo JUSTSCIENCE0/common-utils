@@ -3,6 +3,8 @@
 #
 # License: MIT
 
+include(StringUtils)
+
 # helpers
 
 function(set_simd_compile_unit_flag
@@ -93,6 +95,7 @@ function(generate_simd_compile_units
 
         set(CLASS_TYPE "BASE")
         set(CURRENT_SUPPORTED_SET "DEF")
+        capitalize_first_letter("${IMPLEMENTATION_NAME}" BASE_CLASS_NAME)
         set(GENERATED_FILE ${CMAKE_CURRENT_LIST_DIR}/generated/${IMPLEMENTATION_NAME}_base.cpp)
         configure_file(${COMPILE_UNIT_TEMPLATE} ${GENERATED_FILE} @ONLY)
         set(GENERATED_FILES ${GENERATED_FILE})
