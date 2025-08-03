@@ -56,6 +56,10 @@ endfunction()
 # Arguments:
 #  target — the project to which the generated source files will be added
 #  implementation — the name of the implementation for which the files are generated
+#  logic_unit - The type used for template generation.
+#               Supported values:
+#               function – supports standalone C-style functions
+#               class – supports class-based implementation with inheritance and polymorphism
 #  supported_sets — the list of supported instruction sets
 #
 # Preconditions:
@@ -65,11 +69,9 @@ endfunction()
 function(generate_simd_compile_units
     target
     implementation
+    logic_unit
     #LIST supported_sets 
 )
-    set(IMPLEMENTATION_NAME   ${implementation})
-    set(COMPILE_UNIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Templates/simd-compile-unit.template)
-    set(INTERFACE_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Templates/simd-interface.template)
     set(CU_SIMD_SUPPORT_DEF    0)
     set(CU_SIMD_SUPPORT_SSE    0)
     set(CU_SIMD_SUPPORT_SSE2   0)
@@ -80,6 +82,24 @@ function(generate_simd_compile_units
     set(CU_SIMD_SUPPORT_AVX    0)
     set(CU_SIMD_SUPPORT_AVX2   0)
     set(CU_SIMD_SUPPORT_AVX512 0)
+
+    set(IMPLEMENTATION_NAME ${implementation})
+    if (${logic_unit} MATCHES "function")
+        set(COMPILE_UNIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Templates/simd-compile-unit.template)
+        set(INTERFACE_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Templates/simd-interface.template)
+    elseif(${logic_unit} MATCHES "class")
+        set(COMPILE_UNIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Templates/simd-compile-unit-class.template)
+        set(INTERFACE_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Templates/simd-interface-class.template)
+
+        set(CLASS_TYPE "BASE")
+        set(CURRENT_SUPPORTED_SET "DEF")
+        set(GENERATED_FILE ${CMAKE_CURRENT_LIST_DIR}/generated/${IMPLEMENTATION_NAME}_base.cpp)
+        configure_file(${COMPILE_UNIT_TEMPLATE} ${GENERATED_FILE} @ONLY)
+        set(GENERATED_FILES ${GENERATED_FILE})
+    else()
+        message(FATAL_ERROR "unknown logic unit")
+    endif()
+    set(CLASS_TYPE "DERIVED")
 
     foreach(supported_set IN LISTS ARGN)
         parse_simd_sets_group(supported_set is_single sets_list)
