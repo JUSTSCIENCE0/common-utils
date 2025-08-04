@@ -10,6 +10,13 @@
 #pragma once
 
 #include <cu/simd-utils.hpp>
+#include <cu/cpu-utils.hpp>
+
+#include <memory>
+
+/// Begin of class declaration section
+#define CU_SIMD_CLASS_DECLARATION_SECTION
+#define CU_SIMD_ADD_FACTORY()
 
 // Common
 
@@ -137,3 +144,20 @@
 #undef CU_SIMD_ABSTRACT_MTD
 #undef CU_SIMD_BASE_ATTR
 #undef CU_SIMD_EXTRA_ATTR
+
+/// End of class declaration section
+#undef CU_SIMD_CLASS_DECLARATION_SECTION
+#undef CU_SIMD_ADD_FACTORY
+
+/// Factory definition section
+
+#define CU_SIMD_ADD_FACTORY() \
+    template<typename... ArgTypes> \
+    std::unique_ptr<@BASE_CLASS_NAME@> make_@IMPLEMENTATION_NAME@( \
+            CU::InstructionsSet set, ArgTypes&&... args) { \
+        return {}; \
+    }
+
+#include "@IMPLEMENTATION_NAME@_iface.hpp"
+
+#undef CU_SIMD_ADD_FACTORY
