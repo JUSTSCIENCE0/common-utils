@@ -50,11 +50,12 @@ static inline void __cpuidex(   int cpuInfo[4], int function_id, int subfunction
 namespace CU {
     static constexpr auto DEFAULT_INFAM = std::numeric_limits<int>::max();
     static constexpr auto DEFAULT_INSET = std::numeric_limits<int>::max();
+    static constexpr auto AUTO_INSET = -1;
 
-    typedef int InstructionsFamily;
-    typedef int InstructionsSet;
-    typedef int SupportInfam;
-    typedef int SupportInset;
+    using InstructionsFamily = int;
+    using InstructionsSet = int;
+    using SupportInfam = int;
+    using SupportInset = int;
 
 // The supported instruction sets are defined using the INSTRUCTIONS_SETS macro.
 // Custom INSTRUCTIONS_SETS can be used. Due to the limited number of bits in one-hot encoding,
