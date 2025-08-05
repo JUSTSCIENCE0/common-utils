@@ -13,6 +13,7 @@
 #include <cu/cpu-utils.hpp>
 
 #include <memory>
+#include <iostream>
 
 /// Begin of class declaration section
 #define CU_SIMD_CLASS_DECLARATION_SECTION
@@ -151,13 +152,123 @@
 
 /// Factory definition section
 
+
+#define CU_SIMD_FACTORY_BLOCK(POSTFIX) { \
+        constexpr auto current_set = CU::E_INSET_ ## POSTFIX; \
+        bool is_hardware_support = CU::is_inset_supported(current_set); \
+        bool is_equal = (current_set == set); \
+        bool is_auto = (CU::AUTO_INSET == set); \
+        if ((is_equal || is_auto) && is_hardware_support) \
+            return std::make_unique<@BASE_CLASS_NAME@ ## POSTFIX>(std::forward<ArgTypes>(args)...); \
+    }
+
+#if @CU_SIMD_SUPPORT_AVX512@ /*CU_SIMD_SUPPORT_AVX512*/
+/*Bug: check only AVX512F support*/
+#  define CU_SIMD_AVX512_FACTORY_BLOCK { \
+        constexpr auto current_set = CU::E_INSET_AVX512F; \
+        bool is_hardware_support = CU::is_inset_supported(current_set); \
+        bool is_equal = (current_set == set); \
+        bool is_auto = (CU::AUTO_INSET == set); \
+        if ((is_equal || is_auto) && is_hardware_support) \
+            return std::make_unique<@BASE_CLASS_NAME@AVX512>(std::forward<ArgTypes>(args)...); \
+    }
+#else
+#  define CU_SIMD_AVX512_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_AVX2@ /*CU_SIMD_SUPPORT_AVX2*/
+#  define CU_SIMD_AVX2_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(AVX2)
+#else
+#  define CU_SIMD_AVX2_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_AVX@ /*CU_SIMD_SUPPORT_AVX*/
+#  define CU_SIMD_AVX_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(AVX)
+#else
+#  define CU_SIMD_AVX_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_SSE4_2@ /*CU_SIMD_SUPPORT_SSE4_2*/
+#  define CU_SIMD_SSE4_2_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(SSE4_2)
+#else
+#  define CU_SIMD_SSE4_2_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_SSE4_1@ /*CU_SIMD_SUPPORT_SSE4_1*/
+#  define CU_SIMD_SSE4_1_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(SSE4_1)
+#else
+#  define CU_SIMD_SSE4_1_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_SSSE3@ /*CU_SIMD_SUPPORT_SSSE3*/
+#  define CU_SIMD_SSSE3_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(SSSE3)
+#else
+#  define CU_SIMD_SSSE3_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_SSE3@ /*CU_SIMD_SUPPORT_SSE3*/
+#  define CU_SIMD_SSE3_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(SSE3)
+#else
+#  define CU_SIMD_SSE3_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_SSE2@ /*CU_SIMD_SUPPORT_SSE2*/
+#  define CU_SIMD_SSE2_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(SSE2)
+#else
+#  define CU_SIMD_SSE2_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_SSE@ /*CU_SIMD_SUPPORT_SSE*/
+#  define CU_SIMD_SSE_FACTORY_BLOCK CU_SIMD_FACTORY_BLOCK(SSE)
+#else
+#  define CU_SIMD_SSE_FACTORY_BLOCK
+#endif
+
+#if @CU_SIMD_SUPPORT_DEF@ /*CU_SIMD_SUPPORT_DEF*/
+#  define CU_SIMD_DEF_FACTORY_BLOCK { \
+        bool is_equal = (CU::DEFAULT_INSET == set); \
+        bool is_auto = (CU::AUTO_INSET == set); \
+        if (is_equal || is_auto) \
+            return std::make_unique<@BASE_CLASS_NAME@DEF>(std::forward<ArgTypes>(args)...); \
+    }
+#else
+#  define CU_SIMD_DEF_FACTORY_BLOCK
+#endif
+
+// TODO: use log system instead of stdout
+
 #define CU_SIMD_ADD_FACTORY() \
     template<typename... ArgTypes> \
     std::unique_ptr<@BASE_CLASS_NAME@> make_@IMPLEMENTATION_NAME@( \
             CU::InstructionsSet set, ArgTypes&&... args) { \
+        CU_SIMD_AVX512_FACTORY_BLOCK \
+        CU_SIMD_AVX2_FACTORY_BLOCK \
+        CU_SIMD_AVX_FACTORY_BLOCK \
+        CU_SIMD_SSE4_2_FACTORY_BLOCK \
+        CU_SIMD_SSE4_1_FACTORY_BLOCK \
+        CU_SIMD_SSSE3_FACTORY_BLOCK \
+        CU_SIMD_SSE3_FACTORY_BLOCK \
+        CU_SIMD_SSE2_FACTORY_BLOCK \
+        CU_SIMD_SSE_FACTORY_BLOCK \
+        CU_SIMD_DEF_FACTORY_BLOCK \
+        \
+        std::cout << "Error: '" CU_STR(@BASE_CLASS_NAME@) "' supported implementation for set '" << \
+            CU::get_inset_name(set) << "' not found" << std::endl; \
         return {}; \
     }
 
 #include "@IMPLEMENTATION_NAME@_iface.hpp"
 
 #undef CU_SIMD_ADD_FACTORY
+#undef CU_SIMD_AVX512_FACTORY_BLOCK
+#undef CU_SIMD_AVX2_FACTORY_BLOCK
+#undef CU_SIMD_AVX_FACTORY_BLOCK
+#undef CU_SIMD_SSE4_2_FACTORY_BLOCK
+#undef CU_SIMD_SSE4_1_FACTORY_BLOCK
+#undef CU_SIMD_SSSE3_FACTORY_BLOCK 
+#undef CU_SIMD_SSE3_FACTORY_BLOCK
+#undef CU_SIMD_SSE2_FACTORY_BLOCK
+#undef CU_SIMD_SSE_FACTORY_BLOCK
+#undef CU_SIMD_DEF_FACTORY_BLOCK
+#undef CU_SIMD_FACTORY_BLOCK
+
