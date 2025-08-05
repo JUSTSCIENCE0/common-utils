@@ -293,10 +293,18 @@ namespace CU {
     }
 
     static inline const char* get_infam_name(InstructionsFamily infam) {
+        if (DEFAULT_INFAM == infam)
+            return "DEF";
+
         return STR_INSTRUCTIONS_FAMILY[infam];
     }
 
     static inline const char* get_inset_name(InstructionsSet inset) {
+        if (DEFAULT_INSET == inset)
+            return "DEF";
+        if (AUTO_INSET == inset)
+            return "AUTO";
+
         return STR_INSTRUCTIONS_SETS[get_inset_family(inset)][get_inset_index(inset)];
     }
 
