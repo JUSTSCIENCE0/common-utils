@@ -24,5 +24,7 @@ int main(int argc, char* argv[]) {
     if (!CU::parse_cli_args(argc, argv, &cli_config))
         return -1;
 
+    std::cout << cli_config << std::endl;
+
     return 0;
 }

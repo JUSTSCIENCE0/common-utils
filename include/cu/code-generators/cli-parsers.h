@@ -298,3 +298,26 @@ static bool parse_cli_args(int argc, char* const argv[], CLIConfig* config) {
 #undef CLI_VALUABLE_FLAG
 #undef CLI_OPTIONAL_PROPERTY
 #undef CLI_REQUIRED_PROPERTY
+
+static std::ostream& operator<<(std::ostream& os, const CLIConfig& config) {
+    using namespace PrivateImplementation;
+
+#define CLI_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        os << #FULL_NAME << "=" << (config.IDENTIFIER ? "true" : "false") << std::endl;
+#define CLI_VALUABLE_FLAG(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        os << "has-" << #FULL_NAME << "=" << (config.has_ ##IDENTIFIER ? "true" : "false") << std::endl; \
+        os << #FULL_NAME << "=" << config.IDENTIFIER << std::endl;
+#define CLI_OPTIONAL_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        os << #FULL_NAME << "=" << config.IDENTIFIER << std::endl;
+#define CLI_REQUIRED_PROPERTY(FULL_NAME, SHORT_NAME, IDENTIFIER, ...) \
+        os << #FULL_NAME << "=" << config.IDENTIFIER << std::endl;
+
+    CLI_CONFIGURATION
+
+    return os;
+}
+
+#undef CLI_FLAG
+#undef CLI_VALUABLE_FLAG
+#undef CLI_OPTIONAL_PROPERTY
+#undef CLI_REQUIRED_PROPERTY

@@ -16,6 +16,7 @@
 
 #include <initializer_list>
 #include <filesystem>
+#include <iostream>
 
 namespace CU {
 // To define the properties and flags of your command-line interface, you need to define the macro CLI_CONFIGURATION.
