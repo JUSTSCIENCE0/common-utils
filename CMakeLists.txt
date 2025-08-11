@@ -59,6 +59,7 @@ set(INTERFACE_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/macro-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/profile-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/math-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/enum-utils.hpp
 )
 
 if (ENABLE_CU_TEST_UTILS)
@@ -71,6 +72,7 @@ set(IMPLEMENTATION
     include/cu/code-generators/instructions-sets.h
     include/cu/code-generators/cli-parsers.h
     include/cu/code-generators/macro-helpers.h
+    include/cu/code-generators/enum-generator.h
     src/log-utils.cpp
     src/profile-utils.cpp
 )
