@@ -92,6 +92,8 @@ namespace CU {
         std::vector<Unit> result_data(output_data.size());
 
         for (size_t index = 0; index < test_functions.size(); index++) {
+            std::fill(result_data.begin(), result_data.end(), 0.0f);
+
             if (!is_function_can_be_run(test_functions_names[index])) {
                 std::cout << "WARNING: function \"" << test_functions_names[index] <<
                     "\" cannot be run on current hardware" << std::endl;
