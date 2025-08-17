@@ -7,6 +7,8 @@
 
 #include <concepts>
 #include <iostream>
+#include <sstream>
+#include <stdint.h>
 
 namespace CU {
     template <typename OptionType>
