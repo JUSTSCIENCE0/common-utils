@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <bitset>
 #include <cstring>
+#include <limits>
 
 #ifdef CU_ARCH_X86_64
 
@@ -364,7 +365,7 @@ namespace CU {
 
         auto func_postfix = function_name.substr(pos + 1);
         std::transform(func_postfix.begin(), func_postfix.end(), func_postfix.begin(),
-            [](unsigned char c) { return (unsigned char)(std::toupper(c)); });
+            [](unsigned char c) { return static_cast<unsigned char>(std::toupper(c)); });
         if (func_postfix == "DEF") {
             // it's default function
             return true;
