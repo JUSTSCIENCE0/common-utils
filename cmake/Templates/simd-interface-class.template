@@ -21,17 +21,18 @@
 
 // Common
 
-#define CU_SIMD_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__)
-#define CU_SIMD_DTOR virtual ~CU_SIMD_CLASS_NAME ()
+#define CU_SIMD_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__);
+#define CU_SIMD_DTOR virtual ~CU_SIMD_CLASS_NAME ();
+#define CU_SIMD_DEF_DTOR virtual ~CU_SIMD_CLASS_NAME () = default;
 
 // Base class
 
-#define CU_SIMD_BASE_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__)
+#define CU_SIMD_BASE_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__);
 #define CU_SIMD_EXTRA_CTOR(/*args*/...)
-#define CU_SIMD_BASE_MTD(ret, name, /*args*/...) ret name(__VA_ARGS__)
+#define CU_SIMD_BASE_MTD(ret, name, /*args*/...) ret name(__VA_ARGS__);
 #define CU_SIMD_EXTRA_MTD(ret, name, /*args*/...)
-#define CU_SIMD_ABSTRACT_MTD(ret, name, /*args*/...) virtual ret name(__VA_ARGS__) = 0
-#define CU_SIMD_BASE_ATTR(type, name, def) type name = def
+#define CU_SIMD_ABSTRACT_MTD(ret, name, /*args*/...) virtual ret name(__VA_ARGS__) = 0;
+#define CU_SIMD_BASE_ATTR(type, name, def) type name = def;
 #define CU_SIMD_EXTRA_ATTR(type, name, def)
 #define CU_SIMD_CLASS_NAME @BASE_CLASS_NAME@
 #define CU_SIMD_CLASS CU_SIMD_CLASS_NAME
@@ -51,12 +52,12 @@
 // Child classes
 
 #define CU_SIMD_BASE_CTOR(/*args*/...)
-#define CU_SIMD_EXTRA_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__)
+#define CU_SIMD_EXTRA_CTOR(/*args*/...) explicit CU_SIMD_CLASS_NAME (__VA_ARGS__);
 #define CU_SIMD_BASE_MTD(ret, name, /*args*/...)
-#define CU_SIMD_EXTRA_MTD(ret, name, /*args*/...) ret name(__VA_ARGS__)
-#define CU_SIMD_ABSTRACT_MTD(ret, name, /*args*/...) virtual ret name(__VA_ARGS__) override
+#define CU_SIMD_EXTRA_MTD(ret, name, /*args*/...) ret name(__VA_ARGS__);
+#define CU_SIMD_ABSTRACT_MTD(ret, name, /*args*/...) virtual ret name(__VA_ARGS__) override;
 #define CU_SIMD_BASE_ATTR(type, name, def)
-#define CU_SIMD_EXTRA_ATTR(type, name, def) type name = def
+#define CU_SIMD_EXTRA_ATTR(type, name, def) type name = def;
 
 #if @CU_SIMD_SUPPORT_DEF@ // CU_SIMD_SUPPORT_DEF
 #define CU_SIMD_CLASS_NAME CU_CONT_CONCAT(@BASE_CLASS_NAME@, DEF)
