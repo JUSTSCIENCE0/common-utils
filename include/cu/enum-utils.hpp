@@ -4,6 +4,7 @@
 // License: MIT
 
 // TODO: doc
+// requires include <cstring>
 // CU_ENUMS_DESCRIPTION
 // 
 // CU_BEGIN_ENUM
@@ -14,8 +15,6 @@
 // 
 // value -1 is reserved
 //
-
-#include <string>
 
 #ifdef CU_ENUMS_DESCRIPTION
 #  include <cu/code-generators/enum-generator.h>
