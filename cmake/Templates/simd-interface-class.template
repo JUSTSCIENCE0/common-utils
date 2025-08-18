@@ -10,7 +10,9 @@
 #pragma once
 
 #include <cu/simd-utils.hpp>
-#include <cu/cpu-utils.hpp>
+#ifndef CU_DISABLE_FACTORY
+#  include <cu/cpu-utils.hpp>
+#endif  // CU_DISABLE_FACTORY
 
 #include <memory>
 #include <iostream>
@@ -152,7 +154,7 @@
 #undef CU_SIMD_ADD_FACTORY
 
 /// Factory definition section
-
+#ifndef CU_DISABLE_FACTORY
 
 #define CU_SIMD_FACTORY_BLOCK(POSTFIX) { \
         constexpr auto current_set = CU::E_INSET_ ## POSTFIX; \
@@ -273,3 +275,4 @@
 #undef CU_SIMD_DEF_FACTORY_BLOCK
 #undef CU_SIMD_FACTORY_BLOCK
 
+#endif // CU_DISABLE_FACTORY
