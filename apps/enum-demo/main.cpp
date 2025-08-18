@@ -3,6 +3,8 @@
 //
 // License: MIT
 
+#include <cstring>
+
 #define CU_ENUMS_DESCRIPTION \
     CU_BEGIN_ENUM(SimpleEnum) \
         CU_ENUM_UNIT(E_SIMPLE_OPTION1) \
