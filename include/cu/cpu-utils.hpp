@@ -344,6 +344,9 @@ namespace CU {
     }
 
     static inline InstructionsSet get_inset_by_name(const char* set_name) {
+        if (!std::strcmp(set_name, "AUTO"))
+            return AUTO_INSET;
+
         for (InstructionsFamily infam = E_INFAM_BEGIN; infam < E_INFAM_END; infam++) {
             for (int inset_index = 0; inset_index < get_insets_count_for_infam(infam); inset_index++) {
                 if (!std::strcmp(STR_INSTRUCTIONS_SETS[infam][inset_index], set_name))
