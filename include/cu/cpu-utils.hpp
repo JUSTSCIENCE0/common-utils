@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <bitset>
 #include <cstring>
+#include <limits>
 
 #ifdef CU_ARCH_X86_64
 
@@ -343,6 +344,9 @@ namespace CU {
     }
 
     static inline InstructionsSet get_inset_by_name(const char* set_name) {
+        if (!std::strcmp(set_name, "AUTO"))
+            return AUTO_INSET;
+
         for (InstructionsFamily infam = E_INFAM_BEGIN; infam < E_INFAM_END; infam++) {
             for (int inset_index = 0; inset_index < get_insets_count_for_infam(infam); inset_index++) {
                 if (!std::strcmp(STR_INSTRUCTIONS_SETS[infam][inset_index], set_name))
@@ -364,7 +368,7 @@ namespace CU {
 
         auto func_postfix = function_name.substr(pos + 1);
         std::transform(func_postfix.begin(), func_postfix.end(), func_postfix.begin(),
-            [](unsigned char c) { return (unsigned char)(std::toupper(c)); });
+            [](unsigned char c) { return static_cast<unsigned char>(std::toupper(c)); });
         if (func_postfix == "DEF") {
             // it's default function
             return true;
