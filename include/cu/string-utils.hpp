@@ -15,7 +15,12 @@ namespace CU {
 
     /// only single byte encoding
     static inline std::string wstr_to_str_simple(const std::wstring& wstr) {
-        return std::string(wstr.begin(), wstr.end());
+        std::string result;
+        result.reserve(wstr.size());
+        for (wchar_t wc : wstr) {
+            result.push_back(static_cast<char>(wc));
+        }
+        return result;
     }
 
     // TODO:
