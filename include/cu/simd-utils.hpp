@@ -5,29 +5,33 @@
 
 #include <cu/macro-utils.hpp>
 
-#if defined(CU_COMPILE_UNIT_SSE)
-#  define FUNC_POSTFIX sse
-#elif defined(CU_COMPILE_UNIT_SSE2)
-#  define FUNC_POSTFIX sse2
-#elif defined(CU_COMPILE_UNIT_SSE3)
-#  define FUNC_POSTFIX sse3
-#elif defined(CU_COMPILE_UNIT_SSSE3)
-#  define FUNC_POSTFIX ssse3
-#elif defined(CU_COMPILE_UNIT_SSE4_1)
-#  define FUNC_POSTFIX sse4_1
-#elif defined(CU_COMPILE_UNIT_SSE4_2)
-#  define FUNC_POSTFIX sse4_2
-#elif defined(CU_COMPILE_UNIT_AVX)
-#  define FUNC_POSTFIX avx
-#elif defined(CU_COMPILE_UNIT_AVX2)
-#  define FUNC_POSTFIX avx2
-#elif defined(CU_COMPILE_UNIT_AVX512)
-#  define FUNC_POSTFIX avx512
-//TODO: we need specific compile_unit for some avx512 instructions set
-//TODO: ARM
-#else // CU_COMPILE_UNIT_DEF or just default implementation
-#  define FUNC_POSTFIX def
-#endif
+#if defined(CU_BUILD_SPECIFIC_SIMD)
+#  define FUNC_POSTFIX CU_BUILD_SPECIFIC_SIMD
+#else
+#  if defined(CU_COMPILE_UNIT_SSE)
+#    define FUNC_POSTFIX sse
+#  elif defined(CU_COMPILE_UNIT_SSE2)
+#    define FUNC_POSTFIX sse2
+#  elif defined(CU_COMPILE_UNIT_SSE3)
+#    define FUNC_POSTFIX sse3
+#  elif defined(CU_COMPILE_UNIT_SSSE3)
+#    define FUNC_POSTFIX ssse3
+#  elif defined(CU_COMPILE_UNIT_SSE4_1)
+#    define FUNC_POSTFIX sse4_1
+#  elif defined(CU_COMPILE_UNIT_SSE4_2)
+#    define FUNC_POSTFIX sse4_2
+#  elif defined(CU_COMPILE_UNIT_AVX)
+#    define FUNC_POSTFIX avx
+#  elif defined(CU_COMPILE_UNIT_AVX2)
+#    define FUNC_POSTFIX avx2
+#  elif defined(CU_COMPILE_UNIT_AVX512)
+#    define FUNC_POSTFIX avx512
+//  TODO: we need specific compile_unit for some avx512 instructions set
+//  TODO: ARM
+#  else // CU_COMPILE_UNIT_DEF or just default implementation
+#    define FUNC_POSTFIX def
+#  endif // CU_COMPILE_UNIT_*
+#endif // CU_BUILD_SPECIFIC_SIMD
 
 // macro CU_SIMD(name)
 // Description: Generates an identifier with a postfix corresponding to the current compilation unit.
