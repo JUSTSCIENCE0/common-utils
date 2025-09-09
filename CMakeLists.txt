@@ -61,6 +61,7 @@ set(INTERFACE_HEADERS
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/math-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/enum-utils.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/cu/string-utils.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/cu/id-utils.hpp
 )
 
 if (ENABLE_CU_TEST_UTILS)
