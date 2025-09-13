@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <cassert>
 #include <stdexcept>
+#include <charconv>
 
 namespace CU {
     namespace PrivateImplementation {
@@ -71,23 +72,51 @@ namespace CU {
         return UidGenerator::Get();
     }
 
-    static inline std::string get_unique_name(const std::string& name) {
+    static inline std::string concat_with_uid(const std::string& name, uid_t uid) {
         std::stringstream ss;
-        ss << name << " {" 
-           << std::hex
-           << std::setw(UID_STR_WIDTH)
-           << std::setfill('0')
-           << get_uid()
-           << "}";
+        ss << name << " {"
+            << std::hex
+            << std::setw(UID_STR_WIDTH)
+            << std::setfill('0')
+            << uid
+            << "}";
         return ss.str();
     }
 
-    static inline std::string extract_name(std::string unique_name) {
-        assert(unique_name.length() > UID_STR_WIDTH + 3); /* {UID_STR_WIDTH}*/
-        assert(unique_name[unique_name.length() - 1] == '}');
+    static inline std::string get_unique_name(const std::string& name) {
+        return concat_with_uid(name, get_uid());
+    }
 
-        auto postfix_offset = unique_name.rfind(" {");
-        assert(postfix_offset != std::string::npos);
-        return unique_name.erase(postfix_offset);
+    static inline bool is_contains_uid(const std::string& name) {
+        if (name.length() < UID_STR_WIDTH + 3) /* space + { + UID_STR_WIDTH + } */
+            return false;
+
+        auto bracket_index = name.length() - 2 - UID_STR_WIDTH;
+        if (!(name[bracket_index - 1] != ' ') || !(name[bracket_index] != '{') || !name.ends_with('}'))
+            return false;
+
+        for (auto i = bracket_index + 1; i < name.length() - 1; i++) {
+            if (!std::isxdigit(name[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    static inline std::string extract_name(std::string unique_name) {
+        assert(is_contains_uid(unique_name));
+
+        const auto uid_index = unique_name.length() - 1 - UID_STR_WIDTH;
+        return unique_name.erase(uid_index);
+    }
+
+    static inline uid_t extract_uid(std::string unique_name) {
+        assert(is_contains_uid(unique_name));
+
+        uid_t result{};
+        const auto uid_start = unique_name.data() + unique_name.length() - 1 - UID_STR_WIDTH;
+        auto [ptr, ec] = std::from_chars(uid_start, uid_start + UID_STR_WIDTH, result, 16);
+        assert(ec == std::errc{});
+        return result;
     }
 }
