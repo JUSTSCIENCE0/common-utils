@@ -25,9 +25,7 @@
 #endif
 
 namespace CU {
-    static inline std::string get_current_module_filename() {
-        namespace fs = std::filesystem;
-
+    static inline std::filesystem::path get_current_module_path() {
         constexpr int max_path = 1024;
 #if  defined(_WIN32)
         wchar_t buf[max_path] = L"";
@@ -35,7 +33,7 @@ namespace CU {
         HMODULE hModule = nullptr;
         if (0 == GetModuleHandleEx(
             GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-            reinterpret_cast<LPCWSTR>(&get_current_module_filename),
+            reinterpret_cast<LPCWSTR>(&get_current_module_path),
             &hModule)) {
             // TODO: use log system, instead of stdout
             std::cout << "failed to get current module handle" << std::endl;
@@ -47,7 +45,7 @@ namespace CU {
         char buf[max_path] = "";
 
         Dl_info info{};
-        if (dladdr(reinterpret_cast<void*>(&get_current_module_filename), &info) && info.dli_fname) {
+        if (dladdr(reinterpret_cast<void*>(&get_current_module_path), &info) && info.dli_fname) {
             std::strncpy(buf, info.dli_fname, max_path);
         }
         else {
@@ -59,8 +57,17 @@ namespace CU {
         static_assert(!"Unsupported OS");
 #endif //  _WIN32
 
-        fs::path module_path(buf);
+        return buf;
+    }
+
+    static inline std::string get_current_module_filename() {
+        auto module_path = get_current_module_path();
         return module_path.stem().string();
+    }
+
+    static inline std::string get_current_module_directory() {
+        auto module_path = get_current_module_path();
+        return module_path.remove_filename().string();
     }
 
     template<typename Unit>
