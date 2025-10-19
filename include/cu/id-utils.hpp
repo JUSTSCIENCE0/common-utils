@@ -115,7 +115,7 @@ namespace CU {
 
         uid_t result{};
         const auto uid_start = unique_name.data() + unique_name.length() - 1 - UID_STR_WIDTH;
-        auto [ptr, ec] = std::from_chars(uid_start, uid_start + UID_STR_WIDTH, result, 16);
+        [[maybe_unused]] auto [ptr, ec] = std::from_chars(uid_start, uid_start + UID_STR_WIDTH, result, 16);
         assert(ec == std::errc{});
         return result;
     }
