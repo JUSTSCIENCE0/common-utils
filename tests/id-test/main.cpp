@@ -26,6 +26,15 @@ TEST(IdPoolTest, BaseFunctional) {
     id_pool.FreeId(1);
     id_pool.FreeId(3);
     ASSERT_EQ(id_pool.LockId(), 1);
+    ASSERT_EQ(id_pool.LockId(), 2);
+    ASSERT_EQ(id_pool.LockId(), 3);
+
+    id_pool.FreeId(3);
+    ASSERT_EQ(id_pool.LockId(), 3);
+
+    id_pool.FreeId(3);
+    id_pool.FreeId(2);
+    ASSERT_EQ(id_pool.LockId(), 2);
 }
 
 TEST(UidGeneratorTest, UniqueImpl) {
