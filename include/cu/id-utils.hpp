@@ -5,6 +5,9 @@
 
 #pragma once
 
+#ifndef CU_ID_TYPE
+#  define CU_ID_TYPE uint32_t
+#endif // !CU_ID_TYPE
 #ifndef CU_UID_TYPE
 #  define CU_UID_TYPE uint64_t
 #endif // !CU_UID_TYPE
@@ -19,8 +22,56 @@
 #include <cassert>
 #include <stdexcept>
 #include <charconv>
+#include <list>
+#include <algorithm>
 
 namespace CU {
+    template<std::unsigned_integral ID_T>
+    class IdPoolT {
+    public:
+        ID_T LockId() {
+            if (!m_available_ids.empty()) {
+                auto it = std::min_element(m_available_ids.begin(), m_available_ids.end());
+                auto id = *it;
+                m_available_ids.erase(it);
+                return id;
+            }
+
+            return m_max_id++;
+        }
+
+        void FreeId(ID_T id) {
+            assert(id < m_max_id);
+
+            if ((m_max_id - 1) == id) {
+                m_max_id--;
+                ClearAvailable();
+                return;
+            }
+
+            m_available_ids.push_back(id);
+        }
+
+    private:
+        void ClearAvailable() {
+            while (!m_available_ids.empty()) {
+                auto it = std::find(m_available_ids.begin(), m_available_ids.end(), m_max_id - 1);
+                if (m_available_ids.end() != it) {
+                    m_available_ids.erase(it);
+                    m_max_id--;
+                }
+                else
+                    return;
+            }
+        }
+
+        ID_T m_max_id = 0;
+        std::list<ID_T> m_available_ids{};
+    };
+
+    using IdPool = IdPoolT<CU_ID_TYPE>;
+    using id_t = CU_ID_TYPE;
+
     namespace PrivateImplementation {
         struct UidGenSingletonTemplate {
             UidGenSingletonTemplate(const UidGenSingletonTemplate&) = delete;
@@ -103,7 +154,7 @@ namespace CU {
         return true;
     }
 
-    static inline std::string extract_name(std::string unique_name) {
+    static inline std::string uid_extract_name(std::string unique_name) {
         assert(is_contains_uid(unique_name));
 
         const auto uid_index = unique_name.length() - 1 - UID_STR_WIDTH;
