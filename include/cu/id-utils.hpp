@@ -22,8 +22,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <charconv>
-#include <list>
-#include <algorithm>
+#include <set>
 
 namespace CU {
     template<std::unsigned_integral ID_T>
@@ -31,7 +30,7 @@ namespace CU {
     public:
         ID_T LockId() {
             if (!m_available_ids.empty()) {
-                auto it = std::min_element(m_available_ids.begin(), m_available_ids.end());
+                auto it = m_available_ids.begin();
                 auto id = *it;
                 m_available_ids.erase(it);
                 return id;
@@ -49,13 +48,13 @@ namespace CU {
                 return;
             }
 
-            m_available_ids.push_back(id);
+            m_available_ids.insert(id);
         }
 
     private:
         void ClearAvailable() {
             while (!m_available_ids.empty()) {
-                auto it = std::find(m_available_ids.begin(), m_available_ids.end(), m_max_id - 1);
+                auto it = m_available_ids.find(m_max_id - 1);
                 if (m_available_ids.end() != it) {
                     m_available_ids.erase(it);
                     m_max_id--;
@@ -66,7 +65,7 @@ namespace CU {
         }
 
         ID_T m_max_id = 0;
-        std::list<ID_T> m_available_ids{};
+        std::set<ID_T> m_available_ids{};
     };
 
     using IdPool = IdPoolT<CU_ID_TYPE>;
