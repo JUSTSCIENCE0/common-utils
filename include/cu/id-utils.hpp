@@ -25,6 +25,9 @@
 #include <set>
 
 namespace CU {
+    using id_t = CU_ID_TYPE;
+    static constexpr auto INVALID_ID = std::numeric_limits<id_t>::max();
+
     template<std::unsigned_integral ID_T>
     class IdPoolT {
     public:
@@ -36,6 +39,7 @@ namespace CU {
                 return id;
             }
 
+            assert(INVALID_ID != m_max_id);
             return m_max_id++;
         }
 
@@ -69,7 +73,6 @@ namespace CU {
     };
 
     using IdPool = IdPoolT<CU_ID_TYPE>;
-    using id_t = CU_ID_TYPE;
 
     namespace PrivateImplementation {
         struct UidGenSingletonTemplate {
