@@ -43,8 +43,12 @@ namespace CU {
             return m_max_id++;
         }
 
+        bool CheckId(ID_T id) const {
+            return (id < m_max_id) && (m_available_ids.end() == m_available_ids.find(id));
+        }
+
         void FreeId(ID_T id) {
-            assert(id < m_max_id);
+            assert(CheckId(id));
 
             if ((m_max_id - 1) == id) {
                 m_max_id--;
