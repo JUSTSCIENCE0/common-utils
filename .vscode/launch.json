@@ -78,7 +78,18 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "json-demo",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "preLaunchTask": "CMake: build",
+            "program": "${workspaceFolder}/build/apps/json-demo/json-demo",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal"
         }
-
     ]
 }

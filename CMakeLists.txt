@@ -101,6 +101,17 @@ if (ENABLE_CU_TEST_UTILS OR BUILD_CU_TEST)
     endif()
 endif()
 
+# MacroJson
+if (NOT TARGET MacroJSON)
+    FetchContent_Declare(
+        MacroJSON
+        GIT_REPOSITORY https://github.com/JUSTSCIENCE0/MacroJSON.git
+        GIT_TAG        cb782b6741e1e5acf30d36875578c212a73b14fa # ver-0.3
+    )
+    FetchContent_MakeAvailable(MacroJSON)
+    set_property(TARGET MacroJSON PROPERTY FOLDER "externals")
+endif()
+
 add_library(common-utils STATIC)
 target_sources(common-utils
     PUBLIC
@@ -180,6 +191,13 @@ function(target_interface_group target_name)
         endif(TARGET_INCLUDE_DIR_POSTFIX)
     endif()
 endfunction()
+
+# External libraries
+target_link_libraries(common-utils
+    PUBLIC
+        MacroJSON
+)
+include(cmake/MJsonEnumExtention.cmake)
 
 if (BUILD_CU_APPS)
     add_subdirectory(apps)
