@@ -179,6 +179,7 @@ function(target_interface_group target_name)
     get_target_property(TARGET_INCLUDE_DIR_POSTFIX ${target_name} INCLUDE_DIR_POSTFIX)
 
     if (TARGET_INTERFACE_HEADERS AND TARGET_INTERFACE_INCLUDE_DIR)
+        list(GET TARGET_INTERFACE_INCLUDE_DIR 0 TARGET_INTERFACE_INCLUDE_DIR)
         if (TARGET_INCLUDE_DIR_POSTFIX)
             source_group(
                 TREE ${TARGET_INTERFACE_INCLUDE_DIR}/${TARGET_INCLUDE_DIR_POSTFIX}
