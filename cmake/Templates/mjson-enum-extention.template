@@ -12,9 +12,11 @@
 #include <macrojson/fundamental.hpp>
 
 #if @MJSON_DEFINE_OBJECT@
+#  define MJSON_OBJECTS_GENERATION_PART
 // struct definition
 #  include <macrojson/object.hpp>
 #  include "@MJSON_DESCR_FILE@"
+#  undef MJSON_OBJECTS_GENERATION_PART
 #endif
 
 // writer
