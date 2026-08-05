@@ -12,6 +12,8 @@
 // enums definition
 #define CU_BEGIN_ENUM(NAME) enum NAME { \
     E_ ## NAME ## _UNKNOWN = -1,
+#define CU_BEGIN_ENUM_TYPED(NAME, TYPE) enum NAME : TYPE { \
+    E_ ## NAME ## _UNKNOWN = -1,
 #define CU_ENUM_UNIT(NAME) NAME,
 #define CU_VALUED_ENUM_UNIT(NAME, VALUE) NAME = VALUE,
 #define CU_ENUM_ANCILLARY_UNITS(PREFIX) \
@@ -23,6 +25,7 @@
 CU_ENUMS_DESCRIPTION
 
 #undef CU_BEGIN_ENUM
+#undef CU_BEGIN_ENUM_TYPED
 #undef CU_ENUM_UNIT
 #undef CU_VALUED_ENUM_UNIT
 #undef CU_ENUM_ANCILLARY_UNITS
@@ -32,6 +35,7 @@ CU_ENUMS_DESCRIPTION
 #define CU_BEGIN_ENUM(NAME) \
     static inline const char* to_string(NAME value) { \
         switch (value) {
+#define CU_BEGIN_ENUM_TYPED(NAME, TYPE) CU_BEGIN_ENUM(NAME)
 #define CU_ENUM_UNIT(NAME) \
         case NAME : \
             return #NAME ;
@@ -48,6 +52,7 @@ CU_ENUMS_DESCRIPTION
 CU_ENUMS_DESCRIPTION
 
 #undef CU_BEGIN_ENUM
+#undef CU_BEGIN_ENUM_TYPED
 #undef CU_ENUM_UNIT
 #undef CU_VALUED_ENUM_UNIT
 #undef CU_ENUM_ANCILLARY_UNITS
@@ -56,6 +61,7 @@ CU_ENUMS_DESCRIPTION
 // enum from string
 #define CU_BEGIN_ENUM(NAME) \
     static inline NAME NAME ## _from_string(const char* str) {
+#define CU_BEGIN_ENUM_TYPED(NAME, TYPE) CU_BEGIN_ENUM(NAME)
 #define CU_ENUM_UNIT(NAME) \
         if (!std::strcmp(str, #NAME)) return NAME;
 #define CU_VALUED_ENUM_UNIT(NAME, VALUE) \
@@ -68,6 +74,7 @@ CU_ENUMS_DESCRIPTION
 CU_ENUMS_DESCRIPTION
 
 #undef CU_BEGIN_ENUM
+#undef CU_BEGIN_ENUM_TYPED
 #undef CU_ENUM_UNIT
 #undef CU_VALUED_ENUM_UNIT
 #undef CU_ENUM_ANCILLARY_UNITS

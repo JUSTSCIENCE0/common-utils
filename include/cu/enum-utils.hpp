@@ -7,13 +7,14 @@
 // requires include <cstring>
 // CU_ENUMS_DESCRIPTION
 // 
-// CU_BEGIN_ENUM
-// CU_ENUM_UNIT
-// CU_VALUED_ENUM_UNIT
-// CU_ENUM_ANCILLARY_UNITS
-// CU_END_ENUM
+// CU_BEGIN_ENUM(NAME)
+// CU_BEGIN_ENUM_TYPED(NAME, TYPE) # only signed integer types are allowed
+// CU_ENUM_UNIT(NAME)
+// CU_VALUED_ENUM_UNIT(NAME, VALUE)
+// CU_ENUM_ANCILLARY_UNITS(PREFIX)
+// CU_END_ENUM(NAME)
 // 
-// value -1 is reserved
+// value -1 is reserved for UNKNOWN enum value
 //
 
 #ifdef CU_ENUMS_DESCRIPTION
