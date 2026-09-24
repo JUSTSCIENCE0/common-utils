@@ -106,7 +106,7 @@ if (NOT TARGET MacroJSON)
     FetchContent_Declare(
         MacroJSON
         GIT_REPOSITORY https://github.com/JUSTSCIENCE0/MacroJSON.git
-        GIT_TAG        9d8552c3eba7675af35604c911775af52632ddf5 # main 08.08.26
+        GIT_TAG        6e476d55ebd916665d23e47f6b25e6218b01a3ef # ver-0.4
     )
     FetchContent_MakeAvailable(MacroJSON)
     set_property(TARGET MacroJSON PROPERTY FOLDER "externals")
