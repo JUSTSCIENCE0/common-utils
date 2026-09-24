@@ -9,6 +9,7 @@
 
 #include <thread>
 
+#if defined(ENABLE_CU_PROFILE)
 static inline void some_work() {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
@@ -38,3 +39,8 @@ int main(int argc, char* argv[]) {
     auto profile_results = CU_PROFILE_GET_RESULTS();
     return 0;
 }
+#else
+int main() {
+    return 0;
+}
+#endif
