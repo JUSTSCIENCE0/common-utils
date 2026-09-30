@@ -44,6 +44,9 @@
 #define MJSON_DERIVED_OBJECT_FIELD(type, field, ...)
 #define MJSON_DERIVED_OBJECT_END(obj_name)
 #define MJSON_POLYMORPHIC_OBJECT_END()
+#define MJSON_VARIANT_BEGIN
+#define MJSON_VARIANT_UNIT
+#define MJSON_VARIANT_END
 
 #define MJSON_ENUM_BEGIN(enum_name, ...) \
 namespace macrojson { \
@@ -78,6 +81,9 @@ namespace macrojson { \
 #define MJSON_DERIVED_OBJECT_FIELD(type, field, ...)
 #define MJSON_DERIVED_OBJECT_END(obj_name)
 #define MJSON_POLYMORPHIC_OBJECT_END()
+#define MJSON_VARIANT_BEGIN
+#define MJSON_VARIANT_UNIT
+#define MJSON_VARIANT_END
 
 #define MJSON_ENUM_BEGIN(enum_name, ...) \
 namespace macrojson { \
